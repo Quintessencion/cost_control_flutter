@@ -3,6 +3,8 @@ import 'package:flutter_redux/flutter_redux.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/view_models/mainViewModel.dart';
 import 'package:cost_control/redux/actions/mainActions.dart';
+import 'package:cost_control/utils/timeUtils.dart';
+import 'package:cost_control/views/MonthFragment.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -16,7 +18,8 @@ class _MainScreenState extends State<MainScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(vsync: this, length: 12);
+    _tabController =
+        TabController(vsync: this, length: TimeUtils.MONTH_IN_YEAR);
   }
 
   @override
@@ -53,7 +56,17 @@ class _MainScreenState extends State<MainScreen>
         title: getTabBar(vm),
         bottom: getBottomBarLine(),
       ),
-      body: Container(color: Theme.of(context).primaryColor),
+      body: getTabView(vm),
+    );
+  }
+
+  Widget getTabView(MainViewModel vm) {
+    if (vm.state.months == null) {
+      return null;
+    }
+    return TabBarView(
+      controller: _tabController,
+      children: vm.state.months.map((month) => MonthFragment(month)).toList(),
     );
   }
 
