@@ -11,7 +11,7 @@ class DayView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 16, left: 16, right: 16),
+      margin: EdgeInsets.symmetric(horizontal: 16),
       child: IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,

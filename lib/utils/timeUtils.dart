@@ -12,9 +12,8 @@ class TimeUtils {
         a.day == b.day;
   }
 
-  static int getDaysCountByMonth(int month) {
-    DateTime now = DateTime.now();
-    return month < MONTH_IN_YEAR ? DateTime(now.year, month + 1, 0).day : DateTime(now.year + 1, 1, 0).day;
+  static int getDaysCountByDate(DateTime day) {
+    return day.month < MONTH_IN_YEAR ? DateTime(day.year, day.month + 1, 0).day : DateTime(day.year + 1, 1, 0).day;
   }
 
   static String getMonthNameByNumber(int month) {

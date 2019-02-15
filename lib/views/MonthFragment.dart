@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cost_control/views/DayView.dart';
 import 'package:cost_control/entities/month.dart';
-import 'package:cost_control/entities/day.dart';
 
 class MonthFragment extends StatefulWidget {
   final Month month;
@@ -18,52 +17,52 @@ class _MonthFragmentState extends State<MonthFragment> {
     return Container(
       color: Theme.of(context).primaryColor,
       constraints: BoxConstraints.expand(),
-      child: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(left: 20, top: 26),
-              child: Text(
-                "Остаток на сегодня:",
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 18,
-                  color: Color.fromRGBO(122, 149, 242, 1),
-                ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(left: 20, top: 26),
+            child: Text(
+              "Остаток на сегодня:",
+              style: TextStyle(
+                fontFamily: "SFPro",
+                fontSize: 18,
+                color: Color.fromRGBO(122, 149, 242, 1),
               ),
             ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text(
-                    "518 ₽",
-                    style: TextStyle(
-                      fontFamily: "SFPro",
-                      fontSize: 78,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.white,
-                    ),
+          ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Padding(
+                padding: EdgeInsets.only(left: 20),
+                child: Text(
+                  "518 ₽",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 78,
+                    fontWeight: FontWeight.w300,
+                    color: Colors.white,
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(left: 16, top: 16),
-                  child: Container(
-                    width: 40,
-                    height: 40,
-                    child: FloatingActionButton(
-                      backgroundColor: Colors.white,
-                      foregroundColor: Color.fromRGBO(244, 93, 1, 1),
-                      child: Icon(Icons.add),
-                      onPressed: null,
-                    ),
+              ),
+              Padding(
+                padding: EdgeInsets.only(left: 16, top: 16),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  child: FloatingActionButton(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Color.fromRGBO(244, 93, 1, 1),
+                    child: Icon(Icons.add),
+                    onPressed: null,
                   ),
-                )
-              ],
-            ),
-            Container(
+                ),
+              )
+            ],
+          ),
+          Expanded(
+            child: Container(
               decoration: BoxDecoration(
                 color: Color.fromRGBO(91, 122, 229, 1),
                 borderRadius: BorderRadius.only(
@@ -74,7 +73,7 @@ class _MonthFragmentState extends State<MonthFragment> {
               child: Column(
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(top: 16),
+                    padding: EdgeInsets.symmetric(vertical: 16),
                     child: Row(
                       children: <Widget>[
                         Padding(
@@ -133,17 +132,23 @@ class _MonthFragmentState extends State<MonthFragment> {
                       ],
                     ),
                   ),
-                  Column(
-                    children: widget.month.days
-                        .map((day) => DayView(widget.month, day))
-                        .toList(),
+                  Expanded(
+                    child: ListView.separated(
+                      padding: EdgeInsets.only(bottom: 16),
+                      itemCount: widget.month.days.length,
+                      separatorBuilder: (BuildContext context, int i) {
+                        return Divider(height: 16, color: Colors.transparent);
+                      },
+                      itemBuilder: (context, index) {
+                        return DayView(widget.month, widget.month.days[index]);
+                      },
+                    ),
                   ),
-                  Padding(padding: EdgeInsets.only(top: 16)),
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
