@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
-import 'package:cost_control/views/DayView.dart';
+import 'package:cost_control/views/dayView.dart';
 import 'package:cost_control/entities/month.dart';
 
 class MonthFragment extends StatefulWidget {
   final Month month;
+  final bool isCurrent;
 
-  MonthFragment(this.month);
+  MonthFragment(this.month, this.isCurrent);
 
   @override
   _MonthFragmentState createState() => _MonthFragmentState();
 }
 
 class _MonthFragmentState extends State<MonthFragment> {
+  //Потом надо получать с помощью расчетов
+  static const int DAILY_INCOME = 1000;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.month.computeBalanceWithDailyIncome(1000);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -23,7 +33,7 @@ class _MonthFragmentState extends State<MonthFragment> {
           Padding(
             padding: EdgeInsets.only(left: 20, top: 26),
             child: Text(
-              "Остаток на сегодня:",
+              getTitle(),
               style: TextStyle(
                 fontFamily: "SFPro",
                 fontSize: 18,
@@ -37,13 +47,22 @@ class _MonthFragmentState extends State<MonthFragment> {
               Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text(
-                  "518 ₽",
+                  "518",
                   style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 78,
                     fontWeight: FontWeight.w300,
                     color: Colors.white,
                   ),
+                ),
+              ),
+              Text(
+                " ₽",
+                style: TextStyle(
+                  fontFamily: "SFPro",
+                  fontSize: 78,
+                  fontWeight: FontWeight.w100,
+                  color: Colors.white,
                 ),
               ),
               Padding(
@@ -90,14 +109,27 @@ class _MonthFragmentState extends State<MonthFragment> {
                                 ),
                               ),
                               Padding(padding: EdgeInsets.only(top: 4)),
-                              Text(
-                                "300 ₽",
-                                style: TextStyle(
-                                  fontFamily: "SFPro",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
+                              Row(
+                                children: <Widget>[
+                                  Text(
+                                    widget.month.expensesSum.toString(),
+                                    style: TextStyle(
+                                      fontFamily: "SFPro",
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    " ₽",
+                                    style: TextStyle(
+                                      fontFamily: "SFPro",
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w300,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                ],
                               )
                             ],
                           ),
@@ -117,15 +149,28 @@ class _MonthFragmentState extends State<MonthFragment> {
                                 ),
                               ),
                               Padding(padding: EdgeInsets.only(top: 4)),
-                              Text(
-                                "8 700 ₽",
-                                style: TextStyle(
-                                  fontFamily: "SFPro",
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                ),
-                              )
+                              Row(
+                                children: <Widget>[
+                                  Text(
+                                    widget.month.generalBalance.toString(),
+                                    style: TextStyle(
+                                      fontFamily: "SFPro",
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    " ₽",
+                                    style: TextStyle(
+                                      fontFamily: "SFPro",
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w300,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                ],
+                              ),
                             ],
                           ),
                         ),
@@ -140,7 +185,7 @@ class _MonthFragmentState extends State<MonthFragment> {
                         return Divider(height: 16, color: Colors.transparent);
                       },
                       itemBuilder: (context, index) {
-                        return DayView(widget.month, widget.month.days[index]);
+                        return DayView(widget.month.days[index]);
                       },
                     ),
                   ),
@@ -151,5 +196,13 @@ class _MonthFragmentState extends State<MonthFragment> {
         ],
       ),
     );
+  }
+
+  String getTitle() {
+    if (widget.isCurrent) {
+      return "Остаток на сегодня:";
+    } else {
+      return "Остаток на ${widget.month.name} ${widget.month.yearNumber}:";
+    }
   }
 }

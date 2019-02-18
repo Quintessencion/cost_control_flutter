@@ -5,6 +5,11 @@ import 'package:cost_control/redux/actions/mainActions.dart';
 final mainReducer = combineReducers<MainState>([
   TypedReducer<MainState, OnMonthsLoaded>((state, action) {
     state.months = action.months;
+    state.currentPage = action.currentPage;
+    return state;
+  }),
+  TypedReducer<MainState, SetCurrentPage>((state, action) {
+    state.currentPage = action.currentPage;
     return state;
   })
 ]);

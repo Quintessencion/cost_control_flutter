@@ -23,13 +23,11 @@ class MyApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           primaryColor: Color.fromRGBO(70, 110, 220, 1),
         ),
-          localizationsDelegates: [
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-          ],
-          supportedLocales: [
-            Locale('ru', 'RUS')
-          ],
+        localizationsDelegates: [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+        ],
+        supportedLocales: [Locale('ru', 'RUS')],
         home: MainScreen(),
       ),
     );

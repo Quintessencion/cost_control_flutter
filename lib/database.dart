@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:path/path.dart';
 import 'package:cost_control/entities/expense.dart';
 import 'package:sqflite/sqflite.dart';
+import 'dart:math';
 
 class DBProvider {
   DBProvider._();
@@ -52,8 +53,8 @@ class DBProvider {
           year: 2019,
           month: 1,
           day: 2,
-          description: "Отдых",
-          cost: 1000,
+          description: "Не помню на что",
+          cost: 4000,
         ).toJson());
     await db.insert(
         "Expense",
@@ -65,6 +66,41 @@ class DBProvider {
           description: "Маршрутка",
           cost: 16,
         ).toJson());
+    await db.insert(
+        "Expense",
+        new Expense(
+          id: "4",
+          year: 2019,
+          month: 1,
+          day: 3,
+          description: "Еда",
+          cost: 100,
+        ).toJson());
+  }
+
+  void generateBigData(Database db) async {
+    Random random = new Random();
+    for (int i = 1; i <= 12; i++) {
+      for (int j = 1; j <= 28; j++) {
+        String desc;
+        switch (random.nextInt(4)) {
+          case 0: desc = "Еда"; break;
+          case 1: desc = "Вода"; break;
+          case 2: desc = "Транспорт"; break;
+          case 3: desc = "Что-то"; break;
+        }
+        await db.insert(
+            "Expense",
+            new Expense(
+              id: (i * 30 + j).toString(),
+              year: 2019,
+              month: i,
+              day: j,
+              description: desc,
+              cost: random.nextInt(1500),
+            ).toJson());
+      }
+    }
   }
 
   Future<int> addExpense(Expense expense) async {
@@ -86,8 +122,7 @@ class DBProvider {
     final db = await database;
     var res = await db.query("Expense", where: "id = ?", whereArgs: [id]);
     Completer completer = Completer();
-    completer
-        .complete(await res.isNotEmpty ? Expense.fromJson(res.first) : null);
+    completer.complete(await res.isNotEmpty ? Expense.fromJson(res.first) : null);
     return completer.future;
   }
 

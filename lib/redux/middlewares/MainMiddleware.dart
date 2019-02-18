@@ -1,3 +1,4 @@
+import 'package:tuple/tuple.dart';
 import 'package:redux/redux.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/actions/mainActions.dart';
@@ -12,10 +13,11 @@ class MainMiddleware extends MiddlewareClass<AppState> {
   void call(Store<AppState> store, action, NextDispatcher next) async {
     List<Expense> expenses = await DBProvider.db.getAllExpenses();
     List<Month> months = getAvailableMonths(expenses);
-    for (Expense expense in expenses) {
-      //months[expense.month - 1].days[expense.day - 1].expenses.add(expense);
-    }
-    next(new OnMonthsLoaded(months: months));
+    addExpensesToDays(months, expenses);
+    next(new OnMonthsLoaded(
+      months: months,
+      currentPage: getCurrentPage(months),
+    ));
   }
 
   List<Month> getAvailableMonths(List<Expense> expenses) {
@@ -35,22 +37,33 @@ class MainMiddleware extends MiddlewareClass<AppState> {
 
     List<Month> months = new List();
     while (beginDate.compareTo(endDate) <= 0) {
-      List<Day> days = new List();
+      Month month = new Month(beginDate.year, beginDate.month);
       for (int j = 1; j <= TimeUtils.getDaysCountByDate(beginDate); j++) {
-        days.add(new Day(
-          number: j,
-          monthNumber: beginDate.month,
-          expenses: [],
-        ));
+        month.days.add(new Day(month, j));
       }
-      months.add(new Month(
-        number: beginDate.month,
-        name: TimeUtils.getMonthNameByNumber(beginDate.month),
-        shortName: TimeUtils.getMonthShortNameByNumber(beginDate.month),
-        days: days,
-      ));
+      months.add(month);
       beginDate = DateTime(beginDate.year, beginDate.month + 1, beginDate.day);
     }
     return months;
+  }
+
+  void addExpensesToDays(List<Month> months, List<Expense> expenses) {
+    Map<Tuple2<int, int>, Month> map = new Map();
+    for (Month month in months) {
+      map[Tuple2(month.yearNumber, month.number)] = month;
+    }
+    for (Expense expense in expenses) {
+      Month month = map[Tuple2(expense.year, expense.month)];
+      month.days[expense.day - 1].expenses.add(expense);
+    }
+  }
+
+  int getCurrentPage(List<Month> months) {
+    for (int i = 0; i < months.length; i++) {
+      if (months[i].isBelong(DateTime.now())) {
+        return i;
+      }
+    }
+    return 0;
   }
 }

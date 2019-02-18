@@ -1,7 +1,8 @@
 import 'package:cost_control/redux/states/mainState.dart';
 
 class MainViewModel {
-  MainState state;
+  final MainState state;
+  final void Function(int index) onPageChange;
 
-  MainViewModel({this.state});
+  MainViewModel({this.state, this.onPageChange});
 }
