@@ -9,11 +9,15 @@ import 'package:cost_control/utils/timeUtils.dart';
 import 'package:cost_control/database.dart';
 
 class MainMiddleware extends MiddlewareClass<AppState> {
+  //Потом надо получать с помощью расчетов
+  static const double DAILY_INCOME = 225.80;
+
   @override
   void call(Store<AppState> store, action, NextDispatcher next) async {
     List<Expense> expenses = await DBProvider.db.getAllExpenses();
     List<Month> months = getAvailableMonths(expenses);
     addExpensesToDays(months, expenses);
+    computeMonths(months);
     next(new OnMonthsLoaded(
       months: months,
       currentPage: getCurrentPage(months),
@@ -55,6 +59,12 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     for (Expense expense in expenses) {
       Month month = map[Tuple2(expense.year, expense.month)];
       month.days[expense.day - 1].expenses.add(expense);
+    }
+  }
+
+  void computeMonths(List<Month> months) {
+    for (Month month in months) {
+      month.computeBalanceWithDailyIncome(DAILY_INCOME);
     }
   }
 

@@ -30,8 +30,8 @@ class DayView extends StatelessWidget {
               child: Stack(
                 alignment: Alignment.topRight,
                 children: <Widget>[
-                  Container(width: 132, child: getCoinsText(day.balance)),
-                  Container(width: 68, child: getCoinsText(day.balanceToDay)),
+                  Container(width: 132, child: getCoinsText(day.budget.round())),
+                  Container(width: 68, child: getCoinsText(day.balance.round())),
                 ],
               ),
             )
@@ -54,7 +54,7 @@ class DayView extends StatelessWidget {
           Row(
             children: <Widget>[
               Text(
-                day.expensesSum.toString(),
+                day.expensesSum.round().toString(),
                 style: TextStyle(
                   fontFamily: "SFPro",
                   fontSize: 16,

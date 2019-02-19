@@ -13,15 +13,6 @@ class MonthFragment extends StatefulWidget {
 }
 
 class _MonthFragmentState extends State<MonthFragment> {
-  //Потом надо получать с помощью расчетов
-  static const int DAILY_INCOME = 1000;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.month.computeBalanceWithDailyIncome(1000);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -47,7 +38,7 @@ class _MonthFragmentState extends State<MonthFragment> {
               Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text(
-                  "518",
+                  widget.month.balanceToCurrentDay.round().toString(),
                   style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 78,
@@ -112,7 +103,7 @@ class _MonthFragmentState extends State<MonthFragment> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    widget.month.expensesSum.toString(),
+                                    widget.month.expensesSum.round().toString(),
                                     style: TextStyle(
                                       fontFamily: "SFPro",
                                       fontSize: 16,
@@ -152,7 +143,9 @@ class _MonthFragmentState extends State<MonthFragment> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    widget.month.generalBalance.toString(),
+                                    widget.month.generalBalance
+                                        .round()
+                                        .toString(),
                                     style: TextStyle(
                                       fontFamily: "SFPro",
                                       fontSize: 16,

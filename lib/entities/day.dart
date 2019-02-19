@@ -5,19 +5,21 @@ class Day {
   Month _parent;
   int _number;
   List<Expense> _expenses;
-  int balance;
-  int balanceToDay;
+  double budget;
+  double balance;
 
   Day(this._parent, this._number) {
     _expenses = new List();
   }
 
   Month get parent => _parent;
+
   int get number => _number;
+
   List<Expense> get expenses => _expenses;
 
-  int get expensesSum {
-    int res = 0;
+  double get expensesSum {
+    double res = 0;
     for (Expense e in _expenses) {
       res += e.cost;
     }

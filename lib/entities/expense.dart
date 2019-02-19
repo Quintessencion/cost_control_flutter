@@ -4,7 +4,7 @@ class Expense {
   int month;
   int day;
   String description;
-  int cost;
+  double cost;
 
   Expense({
     this.id,

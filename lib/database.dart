@@ -29,7 +29,7 @@ class DBProvider {
           "month INTEGER,"
           "day INTEGER,"
           "description TEXT,"
-          "cost INTEGER"
+          "cost REAL"
           ")");
       generateTestData(db);
     });
@@ -97,7 +97,7 @@ class DBProvider {
               month: i,
               day: j,
               description: desc,
-              cost: random.nextInt(1500),
+              cost: random.nextInt(1500).toDouble(),
             ).toJson());
       }
     }
