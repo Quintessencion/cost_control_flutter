@@ -4,6 +4,7 @@ import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/view_models/mainViewModel.dart';
 import 'package:cost_control/redux/actions/mainActions.dart';
 import 'package:cost_control/views/monthFragment.dart';
+import 'package:cost_control/redux/screens/monthInfoScreen.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -60,7 +61,11 @@ class _MainScreenState extends State<MainScreen>
         leading: IconButton(
             icon: Image.asset("assets/images/dollar.png",
                 width: 26.0, height: 26.0),
-            onPressed: null),
+            onPressed: () => Navigator.push(
+                context,
+                new MaterialPageRoute(
+                  builder: (context) => MonthInfoScreen(),
+                ))),
         titleSpacing: 0,
         title: getTabBar(vm),
         bottom: getBottomBarLine(),
