@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 abstract class BaseMonthInfoFragment extends StatelessWidget {
+  final double ITEM_HEIGHT = 50;
+
   Widget getDivider() {
     return Container(
       constraints: BoxConstraints.expand(height: 0.5),
@@ -9,7 +11,8 @@ abstract class BaseMonthInfoFragment extends StatelessWidget {
   }
 
   Widget getContainerLine(String header, double value) {
-    return Padding(
+    return Container(
+      height: ITEM_HEIGHT,
       padding: EdgeInsets.only(top: 16, bottom: 12, left: 20, right: 12),
       child: Row(
         children: <Widget>[

@@ -1,38 +1,45 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:cost_control/entities/monthMovement.dart';
 import 'package:cost_control/views/baseMonthInfoFragment.dart';
-import 'package:cost_control/entities/monthInfo.dart';
+import 'package:cost_control/entities/month.dart';
 
 class IncomesFragment extends BaseMonthInfoFragment {
-  final MonthInfo _monthInfo;
+  final Month _month;
+  final void Function(MonthMovement) onEditIncome;
 
-  IncomesFragment(this._monthInfo);
+  IncomesFragment(this._month, {this.onEditIncome});
 
   @override
   Widget build(BuildContext context) {
-    double height = 50.0 *
+    double height = ITEM_HEIGHT *
         max(
-          _monthInfo.expenses.length,
-          _monthInfo.incomes.length,
+          _month.expenses.length,
+          _month.incomes.length,
         );
 
     return Container(
       child: Column(
         children: <Widget>[
-          Container(
-            height: 50.0 * _monthInfo.incomes.length,
-            child: ListView.separated(
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: _monthInfo.incomes.length,
-              separatorBuilder: (BuildContext context, int i) {
-                return getDivider();
-              },
-              itemBuilder: (context, i) {
-                return getContainerLine(
-                  _monthInfo.incomes[i].name,
-                  _monthInfo.incomes[i].sum,
-                );
-              },
+          Material(
+            color: Colors.transparent,
+            child: Container(
+              height: ITEM_HEIGHT * _month.incomes.length,
+              child: ListView.separated(
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: _month.incomes.length,
+                separatorBuilder: (BuildContext context, int i) {
+                  return getDivider();
+                },
+                itemBuilder: (context, i) {
+                  return InkWell(
+                      child: getContainerLine(
+                        _month.incomes[i].name,
+                        _month.incomes[i].sum,
+                      ),
+                      onTap: () => onEditIncome(_month.incomes[i]));
+                },
+              ),
             ),
           ),
           getDivider(),
@@ -75,7 +82,7 @@ class IncomesFragment extends BaseMonthInfoFragment {
           getDivider(),
         ],
       ),
-      constraints: BoxConstraints.expand(height: height + 50),
+      constraints: BoxConstraints.expand(height: height + ITEM_HEIGHT),
     );
   }
 }

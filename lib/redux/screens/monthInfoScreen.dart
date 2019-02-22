@@ -1,10 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:cost_control/views/IncomesFragment.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:cost_control/redux/states/appState.dart';
+import 'package:cost_control/redux/view_models/monthInfoViewModel.dart';
+import 'package:cost_control/redux/actions/monthInfoActions.dart';
+import 'package:cost_control/views/incomesFragment.dart';
 import 'package:cost_control/views/expensesFragment.dart';
-import 'package:cost_control/entities/monthInfo.dart';
-import 'package:cost_control/entities/monthMovement.dart';
+import 'package:cost_control/entities/month.dart';
+import 'package:cost_control/redux/screens/editScreen.dart';
 
 class MonthInfoScreen extends StatefulWidget {
+  final Month month;
+
+  MonthInfoScreen({this.month});
+
   @override
   _MonthInfoScreenState createState() => _MonthInfoScreenState();
 }
@@ -12,38 +20,50 @@ class MonthInfoScreen extends StatefulWidget {
 class _MonthInfoScreenState extends State<MonthInfoScreen>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
-  MonthInfo _monthInfo;
-
-  @override
-  void initState() {
-    super.initState();
-    _tabController = TabController(length: 2, vsync: this);
-    //Заглушка:
-    _monthInfo = MonthInfo(
-      [
-        MonthMovement(0, "Зарплата", 15500),
-        MonthMovement(0, "Сдача в аренду", 517),
-        MonthMovement(0, "Бизнес", 42500),
-        MonthMovement(0, "Накопления", 510000),
-      ],
-      [
-        MonthMovement(0, "Квартира", 15500),
-        MonthMovement(0, "Стоянка", 517),
-        MonthMovement(0, "Спорт", 42500),
-      ],
-      15,
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
+    return StoreConnector<AppState, MonthInfoViewModel>(
+      onInit: (store) {
+        _tabController = TabController(length: 2, vsync: this);
+        store.dispatch(new SetMonth(month: widget.month));
+      },
+      converter: (store) {
+        return MonthInfoViewModel(
+          state: store.state.monthInfoState,
+          onAdd: () {
+            Navigator.push(
+              context,
+              new MaterialPageRoute(
+                builder: (context) =>
+                    new EditScreen(mode: EditScreenMode.CREATE),
+              ),
+            );
+          },
+          onEdit: (movement) {
+            Navigator.push(
+              context,
+              new MaterialPageRoute(
+                builder: (context) => new EditScreen(mode: EditScreenMode.EDIT),
+              ),
+            );
+          },
+        );
+      },
+      builder: (BuildContext context, MonthInfoViewModel vm) {
+        return getView(context, vm);
+      },
+    );
+  }
+
+  Widget getView(BuildContext context, MonthInfoViewModel vm) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text("Январь 2019",
+        title: Text("${vm.state.month.name} ${vm.state.month.yearNumber}",
             style: TextStyle(
               fontFamily: "SFPro",
               fontSize: 18,
@@ -94,7 +114,7 @@ class _MonthInfoScreenState extends State<MonthInfoScreen>
               Container(
                 margin: EdgeInsets.only(left: 20, right: 20, bottom: 36),
                 constraints: BoxConstraints.expand(
-                    height: 50.0 * _monthInfo.incomes.length + 153),
+                    height: 50.0 * vm.state.month.incomes.length + 149),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(
@@ -123,21 +143,31 @@ class _MonthInfoScreenState extends State<MonthInfoScreen>
                       child: TabBarView(
                         controller: _tabController,
                         children: <Widget>[
-                          IncomesFragment(_monthInfo),
-                          ExpensesFragment(_monthInfo),
+                          IncomesFragment(vm.state.month,
+                              onEditIncome: vm.onEdit),
+                          ExpensesFragment(vm.state.month,
+                              onEditExpense: vm.onEdit),
                         ],
                       ),
                     ),
-                    Container(
-                      padding: EdgeInsets.symmetric(vertical: 16),
-                      child: Text(
-                        "Добавить",
-                        style: TextStyle(
-                          fontFamily: "SFPro",
-                          fontSize: 16,
-                          fontWeight: FontWeight.w300,
-                          color: Theme.of(context).primaryColor,
+                    Material(
+                      color: Colors.transparent,
+                      child: InkWell(
+                        child: Container(
+                          width: double.maxFinite,
+                          alignment: Alignment.center,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          child: Text(
+                            "Добавить",
+                            style: TextStyle(
+                              fontFamily: "SFPro",
+                              fontSize: 16,
+                              fontWeight: FontWeight.w300,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
                         ),
+                        onTap: vm.onAdd,
                       ),
                     )
                   ],

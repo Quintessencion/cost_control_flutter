@@ -1,38 +1,45 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:cost_control/views/baseMonthInfoFragment.dart';
-import 'package:cost_control/entities/monthInfo.dart';
+import 'package:cost_control/entities/month.dart';
+import 'package:cost_control/entities/monthMovement.dart';
 
 class ExpensesFragment extends BaseMonthInfoFragment {
-  final MonthInfo _monthInfo;
+  final Month _month;
+  final void Function(MonthMovement) onEditExpense;
 
-  ExpensesFragment(this._monthInfo);
+  ExpensesFragment(this._month, {this.onEditExpense});
 
   @override
   Widget build(BuildContext context) {
-    double height = 50.0 *
+    double height = ITEM_HEIGHT *
         max(
-          _monthInfo.expenses.length,
-          _monthInfo.incomes.length,
+          _month.expenses.length,
+          _month.incomes.length,
         );
 
     return Container(
       child: Column(
         children: <Widget>[
-          Container(
-            height: 50.0 * _monthInfo.expenses.length,
-            child: ListView.separated(
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: _monthInfo.expenses.length,
-              separatorBuilder: (BuildContext context, int i) {
-                return getDivider();
-              },
-              itemBuilder: (context, i) {
-                return getContainerLine(
-                  _monthInfo.expenses[i].name,
-                  _monthInfo.expenses[i].sum,
-                );
-              },
+          Material(
+            color: Colors.transparent,
+            child: Container(
+              height: ITEM_HEIGHT * _month.expenses.length,
+              child: ListView.separated(
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: _month.expenses.length,
+                separatorBuilder: (BuildContext context, int i) {
+                  return getDivider();
+                },
+                itemBuilder: (context, i) {
+                  return InkWell(
+                      child: getContainerLine(
+                        _month.expenses[i].name,
+                        _month.expenses[i].sum,
+                      ),
+                      onTap: () => onEditExpense(_month.expenses[i]));
+                },
+              ),
             ),
           ),
           getDivider(),
@@ -51,7 +58,7 @@ class ExpensesFragment extends BaseMonthInfoFragment {
                 ),
                 Expanded(child: Container()),
                 Text(
-                  _monthInfo.accumulationPercentage.toString(),
+                  _month.accumulationPercentage.toString(),
                   style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 16,
@@ -111,7 +118,7 @@ class ExpensesFragment extends BaseMonthInfoFragment {
           getDivider(),
         ],
       ),
-      constraints: BoxConstraints.expand(height: height + 50),
+      constraints: BoxConstraints.expand(height: height + ITEM_HEIGHT),
     );
   }
 }

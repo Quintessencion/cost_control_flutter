@@ -1,19 +1,30 @@
+import 'package:uuid/uuid.dart';
 import 'package:cost_control/entities/day.dart';
+import 'package:cost_control/entities/monthMovement.dart';
 import 'package:cost_control/utils/timeUtils.dart';
 
 class Month {
+  String _id;
   int _yearNumber;
   int _number;
+  List<MonthMovement> incomes;
+  List<MonthMovement> expenses;
+  int accumulationPercentage;
   String _name;
   String _shortName;
   List<Day> _days;
   double _generalBalance;
 
   Month(this._yearNumber, this._number) {
+    _id = Uuid().v1();
     _name = TimeUtils.getMonthNameByNumber(_number);
     _shortName = TimeUtils.getMonthShortNameByNumber(_number);
     _days = new List();
+    incomes = [];
+    expenses = [];
   }
+
+  String get id => _id;
 
   int get yearNumber => _yearNumber;
 

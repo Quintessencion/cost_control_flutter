@@ -5,6 +5,7 @@ import 'package:cost_control/redux/actions/mainActions.dart';
 import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/entities/expense.dart';
+import 'package:cost_control/entities/monthMovement.dart';
 import 'package:cost_control/utils/timeUtils.dart';
 import 'package:cost_control/database.dart';
 
@@ -17,6 +18,7 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     List<Expense> expenses = await DBProvider.db.getAllExpenses();
     List<Month> months = getAvailableMonths(expenses);
     addExpensesToDays(months, expenses);
+    addMonthExpensesAndIncomes(months);
     computeMonths(months);
     next(new OnMonthsLoaded(
       months: months,
@@ -59,6 +61,59 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     for (Expense expense in expenses) {
       Month month = map[Tuple2(expense.year, expense.month)];
       month.days[expense.day - 1].expenses.add(expense);
+    }
+  }
+
+  void addMonthExpensesAndIncomes(List<Month> months) {
+    //Тестовые данные:
+    for (Month month in months) {
+      month.incomes = [
+        MonthMovement(
+          direction: 1,
+          monthId: month.id,
+          name: "Зарплата",
+          sum: 15500,
+        ),
+        MonthMovement(
+          direction: 1,
+          monthId: month.id,
+          name: "Сдача в аренду",
+          sum: 517,
+        ),
+        MonthMovement(
+          direction: 1,
+          monthId: month.id,
+          name: "Бизнес",
+          sum: 42500,
+        ),
+        MonthMovement(
+          direction: 1,
+          monthId: month.id,
+          name: "Накопления",
+          sum: 510000,
+        ),
+      ];
+      month.expenses = [
+        MonthMovement(
+          direction: -1,
+          monthId: month.id,
+          name: "Квартира",
+          sum: 15500,
+        ),
+        MonthMovement(
+          direction: -1,
+          monthId: month.id,
+          name: "Стоянка",
+          sum: 517,
+        ),
+        MonthMovement(
+          direction: -1,
+          monthId: month.id,
+          name: "Спорт",
+          sum: 42500,
+        ),
+      ];
+      month.accumulationPercentage = 15;
     }
   }
 
