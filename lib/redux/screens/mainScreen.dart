@@ -16,11 +16,6 @@ class _MainScreenState extends State<MainScreen>
   TabController _tabController;
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
     super.dispose();
     _tabController.dispose();
@@ -64,7 +59,8 @@ class _MainScreenState extends State<MainScreen>
             onPressed: () => Navigator.push(
                 context,
                 new MaterialPageRoute(
-                  builder: (context) => MonthInfoScreen(month: vm.state.months[vm.state.currentPage]),
+                  builder: (context) => MonthInfoScreen(
+                      month: vm.state.months[vm.state.currentPage]),
                 ))),
         titleSpacing: 0,
         title: getTabBar(vm),

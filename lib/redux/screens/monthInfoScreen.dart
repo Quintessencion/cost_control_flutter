@@ -1,11 +1,16 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:cost_control/baseScreenState.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/view_models/monthInfoViewModel.dart';
+import 'package:cost_control/redux/states/monthInfoState.dart';
 import 'package:cost_control/redux/actions/monthInfoActions.dart';
 import 'package:cost_control/views/incomesFragment.dart';
 import 'package:cost_control/views/expensesFragment.dart';
 import 'package:cost_control/entities/month.dart';
+import 'package:cost_control/entities/monthMovement.dart';
 import 'package:cost_control/redux/screens/editScreen.dart';
 
 class MonthInfoScreen extends StatefulWidget {
@@ -17,7 +22,7 @@ class MonthInfoScreen extends StatefulWidget {
   _MonthInfoScreenState createState() => _MonthInfoScreenState();
 }
 
-class _MonthInfoScreenState extends State<MonthInfoScreen>
+class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
     with SingleTickerProviderStateMixin {
   TabController _tabController;
 
@@ -31,23 +36,8 @@ class _MonthInfoScreenState extends State<MonthInfoScreen>
       converter: (store) {
         return MonthInfoViewModel(
           state: store.state.monthInfoState,
-          onAdd: () {
-            Navigator.push(
-              context,
-              new MaterialPageRoute(
-                builder: (context) =>
-                    new EditScreen(mode: EditScreenMode.CREATE),
-              ),
-            );
-          },
-          onEdit: (movement) {
-            Navigator.push(
-              context,
-              new MaterialPageRoute(
-                builder: (context) => new EditScreen(mode: EditScreenMode.EDIT),
-              ),
-            );
-          },
+          onAdd: () => openEditScreenAsCreate(store),
+          onEdit: (movement) => openEditScreenAsEdit(store, movement),
         );
       },
       builder: (BuildContext context, MonthInfoViewModel vm) {
@@ -57,6 +47,11 @@ class _MonthInfoScreenState extends State<MonthInfoScreen>
   }
 
   Widget getView(BuildContext context, MonthInfoViewModel vm) {
+    double height = 50.0 *
+        max(vm.state.month.incomes.length + 1,
+            vm.state.month.expenses.length + 2);
+    height += 99;
+
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -113,8 +108,7 @@ class _MonthInfoScreenState extends State<MonthInfoScreen>
               ),
               Container(
                 margin: EdgeInsets.only(left: 20, right: 20, bottom: 36),
-                constraints: BoxConstraints.expand(
-                    height: 50.0 * vm.state.month.incomes.length + 149),
+                constraints: BoxConstraints.expand(height: height),
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(
@@ -216,5 +210,25 @@ class _MonthInfoScreenState extends State<MonthInfoScreen>
         ],
       ),
     );
+  }
+
+  void openEditScreenAsEdit(Store<AppState> store, MonthMovement movement) {
+    openScreen(new EditScreen(
+      mode: EditScreenMode.EDIT,
+      movement: movement,
+    )).then((res) {
+      store.dispatch(new ReloadMonth(month: store.state.monthInfoState.month));
+    });
+  }
+
+  void openEditScreenAsCreate(Store<AppState> store) {
+    int direction = 1 - _tabController.index * 2;
+    openScreen(new EditScreen(
+      mode: EditScreenMode.CREATE,
+      month: store.state.monthInfoState.month,
+      direction: direction,
+    )).then((res) {
+      store.dispatch(new ReloadMonth(month: store.state.monthInfoState.month));
+    });
   }
 }

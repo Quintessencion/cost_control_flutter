@@ -1,27 +1,68 @@
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:cost_control/baseScreenState.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/view_models/editViewModel.dart';
 import 'package:cost_control/redux/actions/editActions.dart';
+import 'package:cost_control/entities/month.dart';
+import 'package:cost_control/entities/monthMovement.dart';
 
-class EditScreen extends StatelessWidget {
+class EditScreen extends StatefulWidget {
   final EditScreenMode mode;
+  final Month month;
+  final int direction;
+  final MonthMovement movement;
 
-  EditScreen({this.mode});
+  EditScreen({this.mode, this.month, this.direction, this.movement});
+
+  @override
+  _EditScreenState createState() => _EditScreenState();
+}
+
+class _EditScreenState extends BaseScreenState<EditScreen> {
+  TextEditingController _nameController;
+  TextEditingController _sumController;
+
+  void init(Store<AppState> store) {
+    if (widget.movement != null) {
+      _nameController = new TextEditingController(text: widget.movement.name);
+      _sumController = new TextEditingController(
+          text: widget.movement.sum.round().toString());
+    } else {
+      _nameController = new TextEditingController();
+      _sumController = new TextEditingController();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, EditViewModel>(
+      onInit: init,
       converter: (store) {
         return EditViewModel(
             state: store.state.editState,
             onSave: () {
-              switch (mode) {
+              switch (widget.mode) {
                 case EditScreenMode.EDIT:
-                  store.dispatch(new EditMovement());
+                  widget.movement.name = _nameController.text;
+                  widget.movement.sum = double.parse(_sumController.text);
+                  store.dispatch(new EditMovement(
+                    movement: widget.movement,
+                    onComplete: back,
+                    onError: showToast,
+                  ));
                   break;
                 case EditScreenMode.CREATE:
-                  store.dispatch(new CreateMovement());
+                  store.dispatch(new CreateMovement(
+                    month: widget.month,
+                    direction: widget.direction,
+                    name: _nameController.text,
+                    sum: double.parse(_sumController.text),
+                    onComplete: back,
+                    onError: showToast,
+                  ));
                   break;
               }
             });
@@ -64,6 +105,7 @@ class EditScreen extends StatelessWidget {
             Padding(
               padding: EdgeInsets.only(left: 16, right: 16, top: 20),
               child: TextFormField(
+                controller: _nameController,
                 style: TextStyle(
                   fontFamily: "SFPro",
                   fontSize: 16,
@@ -81,6 +123,8 @@ class EditScreen extends StatelessWidget {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: TextFormField(
+                controller: _sumController,
+                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
                 style: TextStyle(
                   fontFamily: "SFPro",
                   fontSize: 16,
@@ -96,24 +140,27 @@ class EditScreen extends StatelessWidget {
               ),
             ),
             Expanded(child: Container()),
-            Container(
-              width: double.infinity,
-              padding: EdgeInsets.symmetric(vertical: 16),
-              margin: EdgeInsets.only(left: 20, right: 20, bottom: 16),
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.all(Radius.circular(16)),
-              ),
-              child: Text(
-                "Сохранить",
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Color.fromRGBO(91, 122, 229, 1),
+            InkWell(
+              child: Container(
+                width: double.infinity,
+                padding: EdgeInsets.symmetric(vertical: 16),
+                margin: EdgeInsets.only(left: 20, right: 20, bottom: 16),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(16)),
+                ),
+                child: Text(
+                  "Сохранить",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color.fromRGBO(91, 122, 229, 1),
+                  ),
                 ),
               ),
+              onTap: vm.onSave,
             ),
           ],
         ),
@@ -123,7 +170,7 @@ class EditScreen extends StatelessWidget {
   }
 
   String getTitle() {
-    switch (mode) {
+    switch (widget.mode) {
       case EditScreenMode.CREATE:
         return "Создание";
       case EditScreenMode.EDIT:
@@ -134,7 +181,7 @@ class EditScreen extends StatelessWidget {
   }
 
   List<Widget> getActions() {
-    if (mode == EditScreenMode.CREATE) {
+    if (widget.mode == EditScreenMode.CREATE) {
       return new List();
     }
     return <Widget>[

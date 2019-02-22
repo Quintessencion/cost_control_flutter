@@ -24,6 +24,17 @@ class Month {
     expenses = [];
   }
 
+  Month.withJson({String id, int yearNumber, int number, accumulationPercentage}) {
+    _id = id;
+    _yearNumber = yearNumber;
+    _number = number;
+    _name = TimeUtils.getMonthNameByNumber(number);
+    _shortName = TimeUtils.getMonthShortNameByNumber(number);
+    incomes = [];
+    expenses = [];
+    this.accumulationPercentage = accumulationPercentage;
+  }
+
   String get id => _id;
 
   int get yearNumber => _yearNumber;
@@ -66,4 +77,25 @@ class Month {
     }
     _generalBalance = prevBalance;
   }
+
+  void addJsonData(Month month) {
+    _id = month.id;
+    accumulationPercentage = month.accumulationPercentage;
+    incomes = month.incomes;
+    expenses = month.expenses;
+  }
+
+  factory Month.fromJson(Map<String, dynamic> json) => new Month.withJson(
+        id: json["id"],
+        yearNumber: json["yearNumber"],
+        number: json["number"],
+        accumulationPercentage: json["accumulationPercentage"],
+      );
+
+  Map<String, dynamic> toJson() => {
+        "id": id,
+        "yearNumber": yearNumber,
+        "number": number,
+        "accumulationPercentage": accumulationPercentage,
+      };
 }

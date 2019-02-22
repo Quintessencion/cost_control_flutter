@@ -15,10 +15,19 @@ class MainMiddleware extends MiddlewareClass<AppState> {
 
   @override
   void call(Store<AppState> store, action, NextDispatcher next) async {
+    //Получение "реальных" элеметов из таблицы
     List<Expense> expenses = await DBProvider.db.getAllExpenses();
+    List<Month> dataBaseMonths = await DBProvider.db.getAllMonths();
+    List<MonthMovement> movements = await DBProvider.db.getAllMonthMovements();
+
+    //Получение границы значений "виртуальных" месяцев
     List<Month> months = getAvailableMonths(expenses);
+
+    //Соединение виртуальных и реальных данных
     addExpensesToDays(months, expenses);
-    addMonthExpensesAndIncomes(months);
+    addMonthMovements(dataBaseMonths, movements);
+    addRealMonthData(months, dataBaseMonths);
+
     computeMonths(months);
     next(new OnMonthsLoaded(
       months: months,
@@ -64,56 +73,35 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     }
   }
 
-  void addMonthExpensesAndIncomes(List<Month> months) {
-    //Тестовые данные:
+  void addRealMonthData(List<Month> months, List<Month> databaseMonths) {
+    Map<Tuple2<int, int>, Month> map = new Map();
+    for (Month month in databaseMonths) {
+      map[Tuple2(month.yearNumber, month.number)] = month;
+    }
     for (Month month in months) {
-      month.incomes = [
-        MonthMovement(
-          direction: 1,
-          monthId: month.id,
-          name: "Зарплата",
-          sum: 15500,
-        ),
-        MonthMovement(
-          direction: 1,
-          monthId: month.id,
-          name: "Сдача в аренду",
-          sum: 517,
-        ),
-        MonthMovement(
-          direction: 1,
-          monthId: month.id,
-          name: "Бизнес",
-          sum: 42500,
-        ),
-        MonthMovement(
-          direction: 1,
-          monthId: month.id,
-          name: "Накопления",
-          sum: 510000,
-        ),
-      ];
-      month.expenses = [
-        MonthMovement(
-          direction: -1,
-          monthId: month.id,
-          name: "Квартира",
-          sum: 15500,
-        ),
-        MonthMovement(
-          direction: -1,
-          monthId: month.id,
-          name: "Стоянка",
-          sum: 517,
-        ),
-        MonthMovement(
-          direction: -1,
-          monthId: month.id,
-          name: "Спорт",
-          sum: 42500,
-        ),
-      ];
-      month.accumulationPercentage = 15;
+      Month real = map[Tuple2(month.yearNumber, month.number)];
+      if (real != null) {
+        month.addJsonData(real);
+      }
+    }
+  }
+
+  void addMonthMovements(List<Month> months, List<MonthMovement> movements) {
+    Map<String, Month> map = new Map();
+    for (Month month in months) {
+      map[month.id] = month;
+    }
+    for (MonthMovement movement in movements) {
+      Month month = map[movement.monthId];
+      if (month == null) {
+        continue;
+      }
+      if (movement.direction > 0) {
+        month.incomes.add(movement);
+      }
+      if (movement.direction < 0) {
+        month.expenses.add(movement);
+      }
     }
   }
 
