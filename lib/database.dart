@@ -212,7 +212,7 @@ class DBProvider {
     return completer.future;
   }
 
-  Future<int> deleteMonthMovement(int id) async {
+  Future<int> deleteMonthMovement(String id) async {
     final db = await database;
     return db.delete("MonthMovement", where: "id = ?", whereArgs: [id]);
   }

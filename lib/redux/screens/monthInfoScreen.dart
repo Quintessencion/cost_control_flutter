@@ -38,6 +38,12 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
           state: store.state.monthInfoState,
           onAdd: () => openEditScreenAsCreate(store),
           onEdit: (movement) => openEditScreenAsEdit(store, movement),
+          onChangeAccumulationPercent: (percent) {
+            store.dispatch(new SaveAccumulationPercent(
+              month: store.state.monthInfoState.month,
+              percent: percent,
+            ));
+          },
         );
       },
       builder: (BuildContext context, MonthInfoViewModel vm) {
@@ -99,10 +105,11 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
                 },
                 itemBuilder: (context, index) {
                   return [
-                    getLine("Доход", "15 500"),
-                    getLine("Бюджет на день", "517"),
-                    getLine("Накопление в месяц", "42 500"),
-                    getLine("Накопление в год", "510 000")
+                    getLine("Доход", vm.state.month.budget),
+                    getLine("Бюджет на день", vm.state.month.dayBudget),
+                    getLine(
+                        "Накопление в месяц", vm.state.month.monthAccumulation),
+                    getLine("Накопление в год", vm.state.month.yearAccumulation)
                   ][index];
                 },
               ),
@@ -139,8 +146,12 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
                         children: <Widget>[
                           IncomesFragment(vm.state.month,
                               onEditIncome: vm.onEdit),
-                          ExpensesFragment(vm.state.month,
-                              onEditExpense: vm.onEdit),
+                          ExpensesFragment(
+                            vm.state.month,
+                            onEditExpense: vm.onEdit,
+                            onChangeAccumulationPercent:
+                                vm.onChangeAccumulationPercent,
+                          ),
                         ],
                       ),
                     ),
@@ -175,7 +186,7 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
     );
   }
 
-  Widget getLine(String header, String text) {
+  Widget getLine(String header, double value) {
     return Padding(
       padding: EdgeInsets.only(top: 20, bottom: 16, left: 20, right: 20),
       child: Row(
@@ -191,7 +202,7 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
           ),
           Expanded(child: Container()),
           Text(
-            text,
+            value.round().toString(),
             style: TextStyle(
               fontFamily: "SFPro",
               fontSize: 20,

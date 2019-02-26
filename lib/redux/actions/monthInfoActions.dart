@@ -11,3 +11,10 @@ class ReloadMonth {
 
   ReloadMonth({this.month});
 }
+
+class SaveAccumulationPercent {
+  final Month month;
+  final int percent;
+
+  SaveAccumulationPercent({this.month, this.percent});
+}

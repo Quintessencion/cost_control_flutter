@@ -5,6 +5,12 @@ class MonthInfoViewModel {
   final MonthInfoState state;
   final void Function() onAdd;
   final void Function(MonthMovement) onEdit;
+  final void Function(int) onChangeAccumulationPercent;
 
-  MonthInfoViewModel({this.state, this.onAdd, this.onEdit});
+  MonthInfoViewModel({
+    this.state,
+    this.onAdd,
+    this.onEdit,
+    this.onChangeAccumulationPercent,
+  });
 }

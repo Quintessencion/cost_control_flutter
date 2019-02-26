@@ -3,7 +3,7 @@ import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/actions/mainActions.dart';
 import 'package:cost_control/redux/reducers/mainReducer.dart';
 import 'package:cost_control/redux/reducers/monthInfoReducer.dart';
-import 'package:cost_control/redux/middlewares/MainMiddleware.dart';
+import 'package:cost_control/redux/middlewares/mainMiddleware.dart';
 import 'package:cost_control/redux/actions/monthInfoActions.dart';
 import 'package:cost_control/redux/middlewares/monthInfoMiddleware.dart';
 import 'package:cost_control/redux/reducers/editReducer.dart';
@@ -27,7 +27,7 @@ AppState _getReducers(AppState state, dynamic action) {
 List<Middleware<AppState>> _getMiddlewares() {
   return [
     TypedMiddleware<AppState, LoadMonths>(MainMiddleware()),
-    TypedMiddleware<AppState, ReloadMonth>(MonthInfoMiddleware()),
+    MonthInfoMiddleware(),
     EditMiddleware(),
   ];
 }

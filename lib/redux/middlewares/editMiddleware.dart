@@ -23,6 +23,13 @@ class EditMiddleware extends MiddlewareClass<AppState> {
       } catch (e) {
         action.onError("Ошибка при обновлении записи");
       }
+    } else if (action is DeleteMovement) {
+      try {
+        await deleteMovement(action);
+        action.onComplete();
+      } catch (e) {
+        action.onError("Ошибка при удалении записи");
+      }
     } else {
       next(action);
     }
@@ -45,5 +52,9 @@ class EditMiddleware extends MiddlewareClass<AppState> {
 
   Future<int> editMovement(EditMovement action) async {
     return DBProvider.db.updateMonthMovement(action.movement);
+  }
+
+  Future<int> deleteMovement(DeleteMovement action) async {
+    return DBProvider.db.deleteMonthMovement(action.movement.id);
   }
 }

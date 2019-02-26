@@ -22,6 +22,7 @@ class Month {
     _days = new List();
     incomes = [];
     expenses = [];
+    accumulationPercentage = 0;
   }
 
   Month.withJson({String id, int yearNumber, int number, accumulationPercentage}) {
@@ -69,13 +70,47 @@ class Month {
     return _yearNumber == date.year && _number == date.month;
   }
 
-  void computeBalanceWithDailyIncome(double dailyIncome) {
+  void computeBalance() {
     double prevBalance = 0;
+    double dailyIncome = dayBudget;
     for (Day day in _days) {
       day.budget = dailyIncome + prevBalance;
       prevBalance = day.balance = day.budget - day.expensesSum;
     }
     _generalBalance = prevBalance;
+  }
+
+  double get monthIncomesSum {
+    double res = 0;
+    for (MonthMovement movement in incomes) {
+      res += movement.sum;
+    }
+    return res;
+  }
+
+  double get monthExpensesSum {
+    double res = 0;
+    for (MonthMovement movement in expenses) {
+      res += movement.sum;
+    }
+    res += monthAccumulation;
+    return res;
+  }
+
+  double get budget {
+    return monthIncomesSum - monthExpensesSum;
+  }
+
+  double get dayBudget {
+    return budget / TimeUtils.getDaysCountByDate(new DateTime(_yearNumber, _number));
+  }
+
+  double get monthAccumulation {
+    return monthIncomesSum * accumulationPercentage / 100;
+  }
+
+  double get yearAccumulation {
+    return monthAccumulation * TimeUtils.MONTH_IN_YEAR;
   }
 
   void addJsonData(Month month) {

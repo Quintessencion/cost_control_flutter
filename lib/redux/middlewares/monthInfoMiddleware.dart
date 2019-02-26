@@ -13,6 +13,14 @@ class MonthInfoMiddleware extends MiddlewareClass<AppState> {
       } catch (e) {
         //Nothing
       }
+    } else if (action is SaveAccumulationPercent) {
+      try {
+        savePercent(next, action);
+      } catch (e) {
+
+      }
+    } else {
+      next(action);
     }
   }
 
@@ -21,5 +29,18 @@ class MonthInfoMiddleware extends MiddlewareClass<AppState> {
     if (month != null) {
       next(new SetMonth(month: month));
     }
+  }
+
+  void savePercent(NextDispatcher next, SaveAccumulationPercent action) async {
+    Month month = await DBProvider.db.getMonth(action.month.id);
+    if (month == null) {
+      month = action.month;
+      month.accumulationPercentage = action.percent;
+      await DBProvider.db.addMonth(month);
+    } else {
+      month.accumulationPercentage = action.percent;
+      await DBProvider.db.updateMonth(month);
+    }
+    next(new SetMonth(month: month));
   }
 }

@@ -42,30 +42,38 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
       onInit: init,
       converter: (store) {
         return EditViewModel(
-            state: store.state.editState,
-            onSave: () {
-              switch (widget.mode) {
-                case EditScreenMode.EDIT:
-                  widget.movement.name = _nameController.text;
-                  widget.movement.sum = double.parse(_sumController.text);
-                  store.dispatch(new EditMovement(
-                    movement: widget.movement,
-                    onComplete: back,
-                    onError: showToast,
-                  ));
-                  break;
-                case EditScreenMode.CREATE:
-                  store.dispatch(new CreateMovement(
-                    month: widget.month,
-                    direction: widget.direction,
-                    name: _nameController.text,
-                    sum: double.parse(_sumController.text),
-                    onComplete: back,
-                    onError: showToast,
-                  ));
-                  break;
-              }
-            });
+          state: store.state.editState,
+          onSave: () {
+            switch (widget.mode) {
+              case EditScreenMode.EDIT:
+                widget.movement.name = _nameController.text;
+                widget.movement.sum = double.parse(_sumController.text);
+                store.dispatch(new EditMovement(
+                  movement: widget.movement,
+                  onComplete: back,
+                  onError: showToast,
+                ));
+                break;
+              case EditScreenMode.CREATE:
+                store.dispatch(new CreateMovement(
+                  month: widget.month,
+                  direction: widget.direction,
+                  name: _nameController.text,
+                  sum: double.parse(_sumController.text),
+                  onComplete: back,
+                  onError: showToast,
+                ));
+                break;
+            }
+          },
+          onDelete: () {
+            store.dispatch(new DeleteMovement(
+              movement: widget.movement,
+              onComplete: back,
+              onError: showToast,
+            ));
+          },
+        );
       },
       builder: (BuildContext context, EditViewModel vm) {
         return getView(context, vm);
@@ -88,7 +96,7 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
               fontWeight: FontWeight.w600,
               color: Colors.white,
             )),
-        actions: getActions(),
+        actions: getActions(vm),
         elevation: 0,
       ),
       body: Container(
@@ -180,15 +188,18 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
     }
   }
 
-  List<Widget> getActions() {
+  List<Widget> getActions(EditViewModel vm) {
     if (widget.mode == EditScreenMode.CREATE) {
       return new List();
     }
     return <Widget>[
       Padding(
         padding: EdgeInsets.only(right: 20),
-        child:
-            Image.asset("assets/images/delete.png", width: 20.0, height: 20.0),
+        child: IconButton(
+          icon: Image.asset("assets/images/delete.png",
+              width: 20.0, height: 20.0),
+          onPressed: vm.onDelete,
+        ),
       ),
     ];
   }

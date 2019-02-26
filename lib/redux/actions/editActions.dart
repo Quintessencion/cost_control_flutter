@@ -30,3 +30,15 @@ class EditMovement {
     this.onError,
   });
 }
+
+class DeleteMovement {
+  final MonthMovement movement;
+  final void Function() onComplete;
+  final void Function(String) onError;
+
+  DeleteMovement({
+    this.movement,
+    this.onComplete,
+    this.onError,
+  });
+}

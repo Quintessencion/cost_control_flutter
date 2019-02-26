@@ -59,7 +59,7 @@ class IncomesFragment extends BaseMonthInfoFragment {
                 ),
                 Expanded(child: Container()),
                 Text(
-                  "87 300",
+                  _month.monthIncomesSum.round().toString(),
                   style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 18,

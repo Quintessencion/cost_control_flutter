@@ -1,6 +1,10 @@
 import 'package:cost_control/entities/month.dart';
 
-class LoadMonths {}
+class LoadMonths {
+  final int currentPage;
+
+  LoadMonths({this.currentPage = -1});
+}
 
 class OnMonthsLoaded {
   final List<Month> months;
