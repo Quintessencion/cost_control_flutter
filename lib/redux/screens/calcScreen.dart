@@ -5,9 +5,15 @@ import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/states/calcState.dart';
 import 'package:cost_control/redux/view_models/calcViewModel.dart';
 import 'package:cost_control/redux/actions/calcActions.dart';
+import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/baseScreenState.dart';
+import 'package:cost_control/utils/timeUtils.dart';
 
 class CalcScreen extends StatefulWidget {
+  final Day day;
+
+  CalcScreen({this.day});
+
   @override
   _CalcScreenState createState() => _CalcScreenState();
 }
@@ -37,7 +43,12 @@ class _CalcScreenState extends BaseScreenState<CalcScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         titleSpacing: 0,
-        title: Text("1 Января, Понедельник",
+        title: Text(
+            TimeUtils.getCalcFormat(DateTime(
+              widget.day.parent.yearNumber,
+              widget.day.parent.number,
+              widget.day.number,
+            )),
             style: TextStyle(
               fontFamily: "SFPro",
               fontSize: 18,
@@ -52,7 +63,6 @@ class _CalcScreenState extends BaseScreenState<CalcScreen> {
           color: Color.fromRGBO(91, 122, 229, 1),
           borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
         ),
-        constraints: BoxConstraints.expand(),
         child: Column(
           children: <Widget>[
             Expanded(
@@ -103,15 +113,17 @@ class _CalcScreenState extends BaseScreenState<CalcScreen> {
               constraints: BoxConstraints.expand(height: 0.5),
               color: Color.fromRGBO(122, 149, 242, 1),
             ),
-            Container(
-              color: Color.fromRGBO(122, 149, 242, 1),
-              child: GridView.count(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 0.5,
-                  crossAxisSpacing: 0.5,
-                  children: getButtons(vm)),
+            Flexible(
+              child: Container(
+                color: Color.fromRGBO(122, 149, 242, 1),
+                child: GridView.count(
+                    shrinkWrap: true,
+                    physics: NeverScrollableScrollPhysics(),
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 0.5,
+                    crossAxisSpacing: 0.5,
+                    children: getButtons(vm)),
+              ),
             ),
           ],
         ),

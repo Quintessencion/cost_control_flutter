@@ -68,7 +68,7 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
                     foregroundColor: Color.fromRGBO(244, 93, 1, 1),
                     child: Icon(Icons.add),
                     onPressed: () {
-                      openScreen(new CalcScreen());
+                      openScreen(new CalcScreen(day: widget.month.days[0]));
                     },
                   ),
                 ),
