@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cost_control/views/dayView.dart';
 import 'package:cost_control/entities/month.dart';
+import 'package:cost_control/redux/screens/calcScreen.dart';
+import 'package:cost_control/baseScreenState.dart';
 
 class MonthFragment extends StatefulWidget {
   final Month month;
@@ -12,7 +14,7 @@ class MonthFragment extends StatefulWidget {
   _MonthFragmentState createState() => _MonthFragmentState();
 }
 
-class _MonthFragmentState extends State<MonthFragment> {
+class _MonthFragmentState extends BaseScreenState<MonthFragment> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -65,7 +67,9 @@ class _MonthFragmentState extends State<MonthFragment> {
                     backgroundColor: Colors.white,
                     foregroundColor: Color.fromRGBO(244, 93, 1, 1),
                     child: Icon(Icons.add),
-                    onPressed: null,
+                    onPressed: () {
+                      openScreen(new CalcScreen());
+                    },
                   ),
                 ),
               )

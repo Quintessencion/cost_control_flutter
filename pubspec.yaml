@@ -50,6 +50,7 @@ flutter:
     - assets/images/dollar.png
     - assets/images/calendar.png
     - assets/images/delete.png
+    - assets/images/divide.png
     - assets/jsons/months_init.json
 
   # An image asset can refer to one or more resolution-specific "variants", see

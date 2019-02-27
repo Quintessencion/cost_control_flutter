@@ -8,6 +8,7 @@ import 'package:cost_control/redux/actions/monthInfoActions.dart';
 import 'package:cost_control/redux/middlewares/monthInfoMiddleware.dart';
 import 'package:cost_control/redux/reducers/editReducer.dart';
 import 'package:cost_control/redux/middlewares/editMiddleware.dart';
+import 'package:cost_control/redux/reducers/calcReducer.dart';
 
 Store<AppState> prepareStore() {
   return new Store<AppState>(
@@ -21,6 +22,7 @@ AppState _getReducers(AppState state, dynamic action) {
     mainState: mainReducer(state.mainState, action),
     monthInfoState: monthInfoReducer(state.monthInfoState, action),
     editState: editReducer(state.editState, action),
+    calcState: calcReducer(state.calcState, action),
   );
 }
 
