@@ -4,43 +4,49 @@ import 'package:cost_control/utils/timeUtils.dart';
 
 class DayView extends StatelessWidget {
   final Day day;
+  final Function onClick;
 
-  DayView(this.day);
+  DayView({this.day, this.onClick});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            getDay(),
-            Container(
-              constraints: BoxConstraints.expand(width: 0.5),
-              color: Colors.grey,
-            ),
-            Padding(
-              padding: EdgeInsets.only(left: 16),
-              child: getDescription(),
-            ),
-            Expanded(child: Container()),
-            Padding(
-              padding: EdgeInsets.only(top: 16),
-              child: Stack(
-                alignment: Alignment.topRight,
-                children: <Widget>[
-                  Container(width: 132, child: getCoinsText(day.budget.round())),
-                  Container(width: 68, child: getCoinsText(day.balance.round())),
-                ],
+    return GestureDetector(
+      onTap: onClick,
+      child: Container(
+        margin: EdgeInsets.symmetric(horizontal: 16),
+        child: IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              getDay(),
+              Container(
+                constraints: BoxConstraints.expand(width: 0.5),
+                color: Colors.grey,
               ),
-            )
-          ],
+              Padding(
+                padding: EdgeInsets.only(left: 16),
+                child: getDescription(),
+              ),
+              Expanded(child: Container()),
+              Padding(
+                padding: EdgeInsets.only(top: 16),
+                child: Stack(
+                  alignment: Alignment.topRight,
+                  children: <Widget>[
+                    Container(
+                        width: 132, child: getCoinsText(day.budget.round())),
+                    Container(
+                        width: 68, child: getCoinsText(day.balance.round())),
+                  ],
+                ),
+              )
+            ],
+          ),
         ),
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.all(Radius.circular(12)),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(12)),
+        ),
       ),
     );
   }

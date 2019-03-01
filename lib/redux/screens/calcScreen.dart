@@ -8,6 +8,7 @@ import 'package:cost_control/redux/actions/calcActions.dart';
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/baseScreenState.dart';
 import 'package:cost_control/utils/timeUtils.dart';
+import 'package:cost_control/views/calcItem.dart';
 
 class CalcScreen extends StatefulWidget {
   final Day day;
@@ -18,15 +19,30 @@ class CalcScreen extends StatefulWidget {
   _CalcScreenState createState() => _CalcScreenState();
 }
 
-class _CalcScreenState extends BaseScreenState<CalcScreen> {
+class _CalcScreenState extends BaseScreenState<CalcScreen>
+    with TickerProviderStateMixin {
+  TabController _tabController;
+
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, CalcViewModel>(
+      onInit: (store) {
+        _tabController = TabController(
+          length: store.state.calcState.expenses.length,
+          vsync: this,
+        );
+        _tabController.addListener(() =>
+            store.dispatch(SetCurrentPage(currentPage: _tabController.index)));
+      },
       converter: (store) {
         return CalcViewModel(
           state: store.state.calcState,
           onAddSymbol: (symbol) => store.dispatch(AddSymbol(symbol: symbol)),
           onDeleteSymbol: () => store.dispatch(DeleteSymbol()),
+          onPageChange: (index) =>
+              store.dispatch(SetCurrentPage(currentPage: index)),
+          onChangeDescription: (str) =>
+              store.dispatch(ChangeDescription(description: str)),
         );
       },
       builder: (BuildContext context, CalcViewModel vm) {
@@ -66,44 +82,40 @@ class _CalcScreenState extends BaseScreenState<CalcScreen> {
         child: Column(
           children: <Widget>[
             Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
+              child: Stack(
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.only(top: 8, left: 20, right: 20),
-                    child: TextField(
-                      style: TextStyle(
-                        fontFamily: "SFPro",
-                        fontSize: 16,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.white,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: "Добавить описание",
-                        hintStyle:
-                            TextStyle(color: Color.fromRGBO(122, 149, 242, 1)),
-                        enabledBorder: new UnderlineInputBorder(
-                            borderSide: new BorderSide(
-                                color: Color.fromRGBO(122, 149, 242, 1))),
-                      ),
-                    ),
-                  ),
-                  Text(
-                    vm.state.value,
-                    style: TextStyle(
-                      fontFamily: "SFPro",
-                      fontSize: 78,
-                      fontWeight: FontWeight.w300,
-                      color: Colors.white,
-                    ),
-                  ),
-                  Text(
-                    vm.state.expr,
-                    style: TextStyle(
-                      fontFamily: "SFPro",
-                      fontSize: 28,
-                      fontWeight: FontWeight.w100,
-                      color: Colors.white,
+                  TabBarView(
+                      controller: _tabController,
+                      children: vm.state.expenses.map((exp) {
+                        return CalcItemView(
+                          item: exp,
+                          onChangeDescription: vm.onChangeDescription,
+                        );
+                      }).toList()),
+                  Container(
+                    alignment: Alignment.bottomCenter,
+                    padding: EdgeInsets.only(bottom: 12),
+                    child: Container(
+                      height: 8,
+                      child: ListView.separated(
+                          shrinkWrap: true,
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              width: 8,
+                              height: 8,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: vm.state.currentPage == index
+                                    ? Color.fromRGBO(62, 92, 193, 1)
+                                    : Color.fromRGBO(111, 140, 237, 1),
+                              ),
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return Container(width: 8);
+                          },
+                          itemCount: vm.state.expenses.length),
                     ),
                   ),
                 ],
@@ -113,17 +125,15 @@ class _CalcScreenState extends BaseScreenState<CalcScreen> {
               constraints: BoxConstraints.expand(height: 0.5),
               color: Color.fromRGBO(122, 149, 242, 1),
             ),
-            Flexible(
-              child: Container(
-                color: Color.fromRGBO(122, 149, 242, 1),
-                child: GridView.count(
-                    shrinkWrap: true,
-                    physics: NeverScrollableScrollPhysics(),
-                    crossAxisCount: 4,
-                    mainAxisSpacing: 0.5,
-                    crossAxisSpacing: 0.5,
-                    children: getButtons(vm)),
-              ),
+            Container(
+              color: Color.fromRGBO(122, 149, 242, 1),
+              child: GridView.count(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 0.5,
+                  crossAxisSpacing: 0.5,
+                  children: getButtons(vm)),
             ),
           ],
         ),
@@ -137,7 +147,14 @@ class _CalcScreenState extends BaseScreenState<CalcScreen> {
       getNymericButton(vm, "1"),
       getNymericButton(vm, "2"),
       getNymericButton(vm, "3"),
-      getBaseButton(vm, Image.asset("assets/images/divide.png"), "/"),
+      getBaseButton(
+          vm,
+          Image.asset(
+            "assets/images/divide.png",
+            width: 25,
+            height: 25,
+          ),
+          "/"),
       getNymericButton(vm, "4"),
       getNymericButton(vm, "5"),
       getNymericButton(vm, "6"),

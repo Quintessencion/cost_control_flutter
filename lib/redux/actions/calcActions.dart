@@ -5,3 +5,15 @@ class AddSymbol {
 }
 
 class DeleteSymbol {}
+
+class ChangeDescription {
+  final String description;
+
+  ChangeDescription({this.description});
+}
+
+class SetCurrentPage {
+  final int currentPage;
+
+  SetCurrentPage({this.currentPage});
+}

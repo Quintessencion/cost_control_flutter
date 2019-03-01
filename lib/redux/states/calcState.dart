@@ -1,10 +1,12 @@
-class CalcState {
-  String expr;
-  String value;
+import 'package:cost_control/entities/calcItem.dart';
 
-  CalcState({this.expr, this.value});
+class CalcState {
+  List<CalcItem> expenses;
+  int currentPage;
+
+  CalcState({this.expenses, this.currentPage});
 
   factory CalcState.initial() {
-    return new CalcState(expr: "", value: "0");
+    return new CalcState(expenses: [CalcItem(), CalcItem()], currentPage: 0);
   }
 }

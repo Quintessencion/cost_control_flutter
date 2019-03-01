@@ -182,7 +182,12 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
                         return Divider(height: 16, color: Colors.transparent);
                       },
                       itemBuilder: (context, index) {
-                        return DayView(widget.month.days[index]);
+                        return DayView(
+                            day: widget.month.days[index],
+                            onClick: () {
+                              openScreen(new CalcScreen(
+                                  day: widget.month.days[index]));
+                            });
                       },
                     ),
                   ),
