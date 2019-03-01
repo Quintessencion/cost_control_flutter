@@ -193,14 +193,11 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
       return new List();
     }
     return <Widget>[
-      Padding(
-        padding: EdgeInsets.only(right: 20),
-        child: IconButton(
+      IconButton(
           icon: Image.asset("assets/images/delete.png",
               width: 20.0, height: 20.0),
           onPressed: vm.onDelete,
         ),
-      ),
     ];
   }
 }

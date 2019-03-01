@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:cost_control/redux/states/appState.dart';
-import 'package:cost_control/redux/states/calcState.dart';
 import 'package:cost_control/redux/view_models/calcViewModel.dart';
 import 'package:cost_control/redux/actions/calcActions.dart';
 import 'package:cost_control/entities/day.dart';
@@ -27,8 +25,9 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
   Widget build(BuildContext context) {
     return StoreConnector<AppState, CalcViewModel>(
       onInit: (store) {
+        store.dispatch(InitState(day: widget.day));
         _tabController = TabController(
-          length: store.state.calcState.expenses.length,
+          length: 100,
           vsync: this,
         );
         _tabController.addListener(() =>
@@ -36,14 +35,25 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
       },
       converter: (store) {
         return CalcViewModel(
-          state: store.state.calcState,
-          onAddSymbol: (symbol) => store.dispatch(AddSymbol(symbol: symbol)),
-          onDeleteSymbol: () => store.dispatch(DeleteSymbol()),
-          onPageChange: (index) =>
-              store.dispatch(SetCurrentPage(currentPage: index)),
-          onChangeDescription: (str) =>
-              store.dispatch(ChangeDescription(description: str)),
-        );
+            state: store.state.calcState,
+            onAddSymbol: (symbol) => store.dispatch(AddSymbol(symbol: symbol)),
+            onDeleteSymbol: () => store.dispatch(DeleteSymbol()),
+            onPageChange: (index) =>
+                store.dispatch(SetCurrentPage(currentPage: index)),
+            onChangeDescription: (str) =>
+                store.dispatch(ChangeDescription(description: str)),
+            onDeleteItem: () {
+              store.dispatch(DeleteCurrentPage(onComplete: (index) {
+                _tabController.animateTo(index);
+              }));
+            },
+            onSave: () {
+              store.dispatch(SaveDay(
+                day: widget.day,
+                onComplete: () => Navigator.pop(context),
+                onError: showToast,
+              ));
+            });
       },
       builder: (BuildContext context, CalcViewModel vm) {
         return getView(context, vm);
@@ -56,8 +66,15 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
-          onPressed: () => Navigator.pop(context),
+          onPressed: vm.onSave,
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: Image.asset("assets/images/delete.png",
+                width: 20.0, height: 20.0),
+            onPressed: vm.onDeleteItem,
+          ),
+        ],
         titleSpacing: 0,
         title: Text(
             TimeUtils.getCalcFormat(DateTime(
@@ -84,14 +101,16 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
             Expanded(
               child: Stack(
                 children: <Widget>[
-                  TabBarView(
-                      controller: _tabController,
-                      children: vm.state.expenses.map((exp) {
-                        return CalcItemView(
-                          item: exp,
-                          onChangeDescription: vm.onChangeDescription,
-                        );
-                      }).toList()),
+                  Container(
+                    child: TabBarView(
+                        controller: _tabController,
+                        children: vm.state.expenses.map((exp) {
+                          return CalcItemView(
+                            item: exp,
+                            onChangeDescription: vm.onChangeDescription,
+                          );
+                        }).toList()),
+                  ),
                   Container(
                     alignment: Alignment.bottomCenter,
                     padding: EdgeInsets.only(bottom: 12),

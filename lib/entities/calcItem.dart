@@ -8,4 +8,8 @@ class CalcItem {
     this.value = "",
     this.description = "",
   });
+
+  bool isEmpty() {
+    return expression.isEmpty && value.isEmpty && description.isEmpty;
+  }
 }

@@ -4,6 +4,7 @@ import 'package:path/path.dart';
 import 'package:cost_control/entities/expense.dart';
 import 'package:cost_control/entities/monthMovement.dart';
 import 'package:cost_control/entities/month.dart';
+import 'package:cost_control/entities/day.dart';
 import 'package:sqflite/sqflite.dart';
 import 'dart:math';
 
@@ -46,11 +47,11 @@ class DBProvider {
           "name TEXT,"
           "sum REAL"
           ")");
-      generateTestData(db);
+      await generateTestData(db);
     });
   }
 
-  void generateTestData(Database db) async {
+  Future<int> generateTestData(Database db) async {
     await db.insert(
         "Expense",
         new Expense(
@@ -81,7 +82,7 @@ class DBProvider {
           description: "Маршрутка",
           cost: 16,
         ).toJson());
-    await db.insert(
+    return db.insert(
         "Expense",
         new Expense(
           id: "4",
@@ -131,25 +132,6 @@ class DBProvider {
     return db.insert("Expense", expense.toJson());
   }
 
-  Future<int> updateExpense(Expense expense) async {
-    final db = await database;
-    return db.update(
-      "Expense",
-      expense.toJson(),
-      where: "id = ?",
-      whereArgs: [expense.id],
-    );
-  }
-
-  Future<Expense> getExpense(int id) async {
-    final db = await database;
-    var res = await db.query("Expense", where: "id = ?", whereArgs: [id]);
-    Completer completer = Completer();
-    completer
-        .complete(await res.isNotEmpty ? Expense.fromJson(res.first) : null);
-    return completer.future;
-  }
-
   Future<List<Expense>> getAllExpenses() async {
     final db = await database;
     var res = await db.query("Expense");
@@ -160,9 +142,13 @@ class DBProvider {
     return completer.future;
   }
 
-  Future<int> deleteExpense(int id) async {
+  Future<int> deleteExpensesByDay(Day day) async {
     final db = await database;
-    return db.delete("Expense", where: "id = ?", whereArgs: [id]);
+    return db.delete(
+      "Expense",
+      where: "year = ? AND month = ? AND day = ?",
+      whereArgs: [day.parent.yearNumber, day.parent.number, day.number],
+    );
   }
 
   Future<int> addMonthMovement(MonthMovement movement) async {
@@ -178,15 +164,6 @@ class DBProvider {
       where: "id = ?",
       whereArgs: [movement.id],
     );
-  }
-
-  Future<MonthMovement> getMonthMovement(String id) async {
-    final db = await database;
-    var res = await db.query("MonthMovement", where: "id = ?", whereArgs: [id]);
-    Completer completer = Completer();
-    completer.complete(
-        await res.isNotEmpty ? MonthMovement.fromJson(res.first) : null);
-    return completer.future;
   }
 
   Future<List<MonthMovement>> getMonthMovementsByMonthId(String monthId) async {
@@ -263,6 +240,16 @@ class DBProvider {
         res.isNotEmpty ? res.map((c) => Month.fromJson(c)).toList() : [];
     Completer completer = new Completer<List<Month>>();
     completer.complete(list);
+    return completer.future;
+  }
+
+  Future<int> updateDay(Day day) async {
+    await deleteExpensesByDay(day);
+    for (Expense expense in day.expenses) {
+      await addExpense(expense);
+    }
+    Completer completer = new Completer<int>();
+    completer.complete(0);
     return completer.future;
   }
 }

@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cost_control/views/dayView.dart';
 import 'package:cost_control/entities/month.dart';
-import 'package:cost_control/redux/screens/calcScreen.dart';
+import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/baseScreenState.dart';
 
 class MonthFragment extends StatefulWidget {
   final Month month;
   final bool isCurrent;
+  final Function(Day day) onDayClick;
 
-  MonthFragment(this.month, this.isCurrent);
+  MonthFragment({this.month, this.isCurrent, this.onDayClick});
 
   @override
   _MonthFragmentState createState() => _MonthFragmentState();
@@ -67,9 +68,7 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
                     backgroundColor: Colors.white,
                     foregroundColor: Color.fromRGBO(244, 93, 1, 1),
                     child: Icon(Icons.add),
-                    onPressed: () {
-                      openScreen(new CalcScreen(day: widget.month.days[0]));
-                    },
+                    onPressed: () => widget.onDayClick(widget.month.days[0]),
                   ),
                 ),
               )
@@ -183,11 +182,11 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
                       },
                       itemBuilder: (context, index) {
                         return DayView(
-                            day: widget.month.days[index],
-                            onClick: () {
-                              openScreen(new CalcScreen(
-                                  day: widget.month.days[index]));
-                            });
+                          day: widget.month.days[index],
+                          onClick: () => widget.onDayClick(
+                                widget.month.days[index],
+                              ),
+                        );
                       },
                     ),
                   ),

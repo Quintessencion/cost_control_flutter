@@ -45,6 +45,7 @@ class _CalcItemViewState extends State<CalcItemView> {
             onChanged: widget.onChangeDescription,
           ),
         ),
+        Expanded(child: Container()),
         Text(
           widget.item.value,
           style: TextStyle(
@@ -63,6 +64,7 @@ class _CalcItemViewState extends State<CalcItemView> {
             color: Colors.white,
           ),
         ),
+        Expanded(child: Container()),
       ],
     );
   }

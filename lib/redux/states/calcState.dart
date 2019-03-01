@@ -7,6 +7,6 @@ class CalcState {
   CalcState({this.expenses, this.currentPage});
 
   factory CalcState.initial() {
-    return new CalcState(expenses: [CalcItem(), CalcItem()], currentPage: 0);
+    return new CalcState(expenses: [CalcItem()], currentPage: 0);
   }
 }

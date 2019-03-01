@@ -15,21 +15,27 @@ class DayView extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 16),
         child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: Stack(
             children: <Widget>[
-              getDay(),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  getDay(),
+                  Container(
+                    constraints: BoxConstraints.expand(width: 0.5),
+                    color: Colors.grey,
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding: EdgeInsets.only(left: 16),
+                      child: getDescription(),
+                    ),
+                  ),
+                ],
+              ),
               Container(
-                constraints: BoxConstraints.expand(width: 0.5),
-                color: Colors.grey,
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 16),
-                child: getDescription(),
-              ),
-              Expanded(child: Container()),
-              Padding(
                 padding: EdgeInsets.only(top: 16),
+                alignment: Alignment.topRight,
                 child: Stack(
                   alignment: Alignment.topRight,
                   children: <Widget>[
@@ -81,6 +87,7 @@ class DayView extends StatelessWidget {
           ),
           Text(
             day.description,
+            overflow: TextOverflow.ellipsis,
             style: TextStyle(
               fontFamily: "SFPro",
               fontSize: 14,

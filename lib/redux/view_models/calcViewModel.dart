@@ -6,6 +6,8 @@ class CalcViewModel {
   final void Function() onDeleteSymbol;
   final void Function(String) onChangeDescription;
   final void Function(int) onPageChange;
+  final void Function() onDeleteItem;
+  final void Function() onSave;
 
   CalcViewModel({
     this.state,
@@ -13,5 +15,7 @@ class CalcViewModel {
     this.onDeleteSymbol,
     this.onChangeDescription,
     this.onPageChange,
+    this.onDeleteItem,
+    this.onSave,
   });
 }

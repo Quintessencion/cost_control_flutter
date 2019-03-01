@@ -28,8 +28,10 @@ class Day {
 
   String get description {
     StringBuffer res = new StringBuffer();
-    for (int i = 0; i < _expenses.length; i++) {
-      String description = _expenses[i].description.toLowerCase();
+    List<Expense> withDescription = expenses.where((e) => e.description.isNotEmpty).toList();
+
+    for (int i = 0; i < withDescription.length; i++) {
+      String description = withDescription[i].description.toLowerCase();
       if (i == 0) {
         res.write(description.substring(0, 1).toUpperCase());
         if (description.length > 1) {
