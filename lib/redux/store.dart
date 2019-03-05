@@ -2,7 +2,13 @@ import 'package:redux/redux.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/actions/mainActions.dart';
 import 'package:cost_control/redux/reducers/mainReducer.dart';
-import 'package:cost_control/redux/middlewares/MainMiddleware.dart';
+import 'package:cost_control/redux/reducers/monthInfoReducer.dart';
+import 'package:cost_control/redux/middlewares/mainMiddleware.dart';
+import 'package:cost_control/redux/middlewares/monthInfoMiddleware.dart';
+import 'package:cost_control/redux/middlewares/editMiddleware.dart';
+import 'package:cost_control/redux/actions/calcActions.dart';
+import 'package:cost_control/redux/reducers/calcReducer.dart';
+import 'package:cost_control/redux/middlewares/calcMiddleware.dart';
 
 Store<AppState> prepareStore() {
   return new Store<AppState>(
@@ -14,11 +20,16 @@ Store<AppState> prepareStore() {
 AppState _getReducers(AppState state, dynamic action) {
   return new AppState(
     mainState: mainReducer(state.mainState, action),
+    monthInfoState: monthInfoReducer(state.monthInfoState, action),
+    calcState: calcReducer(state.calcState, action),
   );
 }
 
 List<Middleware<AppState>> _getMiddlewares() {
   return [
     TypedMiddleware<AppState, LoadMonths>(MainMiddleware()),
+    MonthInfoMiddleware(),
+    EditMiddleware(),
+    TypedMiddleware<AppState, SaveDay>(CalcMiddleware()),
   ];
 }
