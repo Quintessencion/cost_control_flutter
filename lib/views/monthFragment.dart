@@ -17,6 +17,22 @@ class MonthFragment extends StatefulWidget {
 }
 
 class _MonthFragmentState extends BaseScreenState<MonthFragment> {
+  ScrollController _scrollController;
+
+  @override
+  void initState() {
+    DateTime now = DateTime.now();
+    if (now.year == widget.month.yearNumber &&
+        now.month == widget.month.number) {
+      int index = now.day - 1;
+      double offset = DayView.HEIGHT * index + (16 * index - 1);
+      _scrollController = new ScrollController(initialScrollOffset: offset);
+    } else {
+      _scrollController = new ScrollController();
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -28,7 +44,7 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
           Padding(
             padding: EdgeInsets.only(left: 20, top: 26),
             child: Text(
-              getTitle(),
+              _getTitle(),
               style: TextStyle(
                 fontFamily: "SFPro",
                 fontSize: 18,
@@ -36,45 +52,7 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
               ),
             ),
           ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.only(left: 20),
-                child: Text(
-                  MoneyUtils.standard(widget.month.balanceToCurrentDay),
-                  style: TextStyle(
-                    fontFamily: "SFPro",
-                    fontSize: 78,
-                    fontWeight: FontWeight.w300,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-              Text(
-                " ₽",
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 78,
-                  fontWeight: FontWeight.w100,
-                  color: Colors.white,
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.only(left: 16, top: 16),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  child: FloatingActionButton(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Color.fromRGBO(244, 93, 1, 1),
-                    child: Icon(Icons.add),
-                    onPressed: () => widget.onDayClick(widget.month.days[0]),
-                  ),
-                ),
-              )
-            ],
-          ),
+          _getHeader(),
           Expanded(
             child: Container(
               decoration: BoxDecoration(
@@ -173,6 +151,7 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
                   ),
                   Expanded(
                     child: ListView.separated(
+                      controller: _scrollController,
                       padding: EdgeInsets.only(bottom: 16),
                       itemCount: widget.month.days.length,
                       separatorBuilder: (BuildContext context, int i) {
@@ -197,7 +176,57 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
     );
   }
 
-  String getTitle() {
+  Widget _getHeader() {
+    List<Widget> elements = new List();
+
+    elements.add(Padding(
+      padding: EdgeInsets.only(left: 20),
+      child: Text(
+        MoneyUtils.standard(widget.month.balanceToCurrentDay),
+        style: TextStyle(
+          fontFamily: "SFPro",
+          fontSize: 78,
+          fontWeight: FontWeight.w300,
+          color: Colors.white,
+        ),
+      ),
+    ));
+
+    elements.add(Text(
+      " ₽",
+      style: TextStyle(
+        fontFamily: "SFPro",
+        fontSize: 78,
+        fontWeight: FontWeight.w100,
+        color: Colors.white,
+      ),
+    ));
+
+    if (widget.isCurrent) {
+      int currentDayIndex = DateTime.now().day - 1;
+      Day currentDay = widget.month.days[currentDayIndex];
+      elements.add(Padding(
+        padding: EdgeInsets.only(left: 16, top: 16),
+        child: Container(
+          width: 40,
+          height: 40,
+          child: FloatingActionButton(
+            backgroundColor: Colors.white,
+            foregroundColor: Color.fromRGBO(244, 93, 1, 1),
+            child: Icon(Icons.add),
+            onPressed: () => widget.onDayClick(currentDay),
+          ),
+        ),
+      ));
+    }
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: elements,
+    );
+  }
+
+  String _getTitle() {
     if (widget.isCurrent) {
       return "Остаток на сегодня:";
     } else {

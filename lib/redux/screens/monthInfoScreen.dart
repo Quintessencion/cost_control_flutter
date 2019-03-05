@@ -73,13 +73,6 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
               color: Colors.white,
             )),
         centerTitle: true,
-        actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.only(right: 20),
-            child: Image.asset("assets/images/calendar.png",
-                width: 20.0, height: 20.0),
-          ),
-        ],
         elevation: 0,
       ),
       body: _getBody(vm),

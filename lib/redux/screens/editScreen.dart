@@ -2,12 +2,15 @@ import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:cost_control/utils/moneyUtils.dart';
 import 'package:cost_control/baseScreenState.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/view_models/editViewModel.dart';
 import 'package:cost_control/redux/actions/editActions.dart';
 import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/monthMovement.dart';
+
+const String _RUBLE = " ₽";
 
 class EditScreen extends StatefulWidget {
   final EditScreenMode mode;
@@ -29,7 +32,7 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
     if (widget.movement != null) {
       _nameController = new TextEditingController(text: widget.movement.name);
       _sumController = new TextEditingController(
-          text: widget.movement.sum.round().toString());
+          text: MoneyUtils.standard(widget.movement.sum) + _RUBLE);
     } else {
       _nameController = new TextEditingController();
       _sumController = new TextEditingController();
@@ -54,7 +57,7 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
             switch (widget.mode) {
               case EditScreenMode.EDIT:
                 widget.movement.name = _nameController.text;
-                widget.movement.sum = double.parse(_sumController.text);
+                widget.movement.sum = _getSum();
                 store.dispatch(new EditMovement(
                   movement: widget.movement,
                   onComplete: back,
@@ -66,7 +69,7 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
                   month: widget.month,
                   direction: widget.direction,
                   name: _nameController.text,
-                  sum: double.parse(_sumController.text),
+                  sum: _getSum(),
                   onComplete: back,
                   onError: showToast,
                 ));
@@ -131,6 +134,8 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
                 color: Color.fromRGBO(238, 238, 238, 1),
               ),
               decoration: InputDecoration(
+                hintText: "Описание",
+                hintStyle: TextStyle(color: Color.fromRGBO(122, 149, 242, 1)),
                 enabledBorder: new UnderlineInputBorder(
                   borderSide:
                       new BorderSide(color: Color.fromRGBO(178, 194, 250, 1)),
@@ -142,7 +147,11 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: TextFormField(
               controller: _sumController,
-              inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+              keyboardType: TextInputType.number,
+              inputFormatters: [
+                WhitelistingTextInputFormatter.digitsOnly,
+                SumInputFormatter(),
+              ],
               style: TextStyle(
                 fontFamily: "SFPro",
                 fontSize: 16,
@@ -150,6 +159,8 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
                 color: Color.fromRGBO(238, 238, 238, 1),
               ),
               decoration: InputDecoration(
+                hintText: "Сумма",
+                hintStyle: TextStyle(color: Color.fromRGBO(122, 149, 242, 1)),
                 enabledBorder: new UnderlineInputBorder(
                   borderSide:
                       new BorderSide(color: Color.fromRGBO(178, 194, 250, 1)),
@@ -211,6 +222,34 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
         onPressed: vm.onDelete,
       ),
     ];
+  }
+
+  double _getSum() {
+    String text = _sumController.text;
+    text = text.replaceAll(_RUBLE, "");
+    text = text.replaceAll(" ", "");
+    return double.parse(text);
+  }
+}
+
+class SumInputFormatter extends TextInputFormatter {
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    String newText;
+    int selection;
+    if (newValue.text.isNotEmpty) {
+      double value = double.parse(newValue.text);
+      newText = MoneyUtils.standard(value);
+      selection = newText.length;
+      newText += _RUBLE;
+    } else {
+      newText = newValue.text;
+      selection = newText.length;
+    }
+    return newValue.copyWith(
+      text: newText,
+      selection: new TextSelection.collapsed(offset: selection),
+    );
   }
 }
 

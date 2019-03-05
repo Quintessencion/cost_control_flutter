@@ -51,6 +51,7 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
             onDeleteItem: () {
               store.dispatch(DeleteCurrentPage(onComplete: (index) {
                 _tabController.animateTo(index);
+                _tabController.notifyListeners();
               }));
             },
             onSave: () {
