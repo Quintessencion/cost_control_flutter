@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cost_control/utils/moneyUtils.dart';
 
 abstract class BaseMonthInfoFragment extends StatelessWidget {
   final double ITEM_HEIGHT = 50;
@@ -27,7 +28,7 @@ abstract class BaseMonthInfoFragment extends StatelessWidget {
           ),
           Expanded(child: Container()),
           Text(
-            value.round().toString(),
+            MoneyUtils.standard(value),
             style: TextStyle(
               fontFamily: "SFPro",
               fontSize: 16,

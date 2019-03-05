@@ -152,10 +152,7 @@ class DayView extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: Color.fromRGBO(40, 90, 255, 1),
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(12),
-                bottomLeft: Radius.circular(12),
-              ),
+              borderRadius: BorderRadius.horizontal(left: Radius.circular(12)),
             ),
           ),
           getBaseDay(Colors.white),

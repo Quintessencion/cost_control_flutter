@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cost_control/utils/moneyUtils.dart';
 import 'package:cost_control/views/dayView.dart';
 import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/day.dart';
@@ -41,7 +42,7 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
               Padding(
                 padding: EdgeInsets.only(left: 20),
                 child: Text(
-                  widget.month.balanceToCurrentDay.round().toString(),
+                  MoneyUtils.standard(widget.month.balanceToCurrentDay),
                   style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 78,
@@ -78,10 +79,7 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
             child: Container(
               decoration: BoxDecoration(
                 color: Color.fromRGBO(91, 122, 229, 1),
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
               ),
               child: Column(
                 children: <Widget>[
@@ -106,7 +104,8 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    widget.month.expensesSum.round().toString(),
+                                    MoneyUtils.standard(
+                                        widget.month.expensesSum),
                                     style: TextStyle(
                                       fontFamily: "SFPro",
                                       fontSize: 16,
@@ -146,9 +145,8 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
                               Row(
                                 children: <Widget>[
                                   Text(
-                                    widget.month.generalBalance
-                                        .round()
-                                        .toString(),
+                                    MoneyUtils.standard(
+                                        widget.month.generalBalance),
                                     style: TextStyle(
                                       fontFamily: "SFPro",
                                       fontSize: 16,

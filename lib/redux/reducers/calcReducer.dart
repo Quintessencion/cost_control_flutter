@@ -1,16 +1,14 @@
 import 'package:redux/redux.dart';
+import 'package:math_expressions/math_expressions.dart';
+import 'package:cost_control/utils/moneyUtils.dart';
 import 'package:cost_control/redux/states/calcState.dart';
 import 'package:cost_control/redux/actions/calcActions.dart';
 import 'package:cost_control/entities/calcItem.dart';
-import 'package:math_expressions/math_expressions.dart';
-import 'package:intl/intl.dart';
-
-final double error = 0.01;
 
 final calcReducer = combineReducers<CalcState>([
   TypedReducer<CalcState, InitState>((state, action) {
     state.expenses = action.day.expenses.map((e) {
-      String cost = NumberFormat("0.##").format(e.cost);
+      String cost = MoneyUtils.twoDigits(e.cost);
       return CalcItem(
         expression: cost,
         value: cost,
@@ -24,7 +22,7 @@ final calcReducer = combineReducers<CalcState>([
     CalcItem item = state.expenses[state.currentPage];
     item.expression += action.symbol;
     item.value = _evaluate(item.expression);
-    checkOnNeedAddItem(state);
+    _checkOnNeedAddItem(state);
     return state;
   }),
   TypedReducer<CalcState, DeleteSymbol>((state, action) {
@@ -43,7 +41,7 @@ final calcReducer = combineReducers<CalcState>([
   TypedReducer<CalcState, ChangeDescription>((state, action) {
     CalcItem item = state.expenses[state.currentPage];
     item.description = action.description;
-    checkOnNeedAddItem(state);
+    _checkOnNeedAddItem(state);
     return state;
   }),
   TypedReducer<CalcState, DeleteCurrentPage>((state, action) {
@@ -74,13 +72,13 @@ String _evaluate(String str) {
     Parser p = new Parser();
     Expression e = p.parse(str);
     double evaluated = e.evaluate(EvaluationType.REAL, ContextModel());
-    return NumberFormat("0.##").format(evaluated);
+    return MoneyUtils.twoDigits(evaluated);
   } catch (e) {
     return "";
   }
 }
 
-void checkOnNeedAddItem(CalcState state) {
+void _checkOnNeedAddItem(CalcState state) {
   CalcItem lastItem = state.expenses.last;
   if (!lastItem.isEmpty()) {
     state.expenses.add(CalcItem());

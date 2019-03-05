@@ -25,7 +25,7 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
   TextEditingController _nameController;
   TextEditingController _sumController;
 
-  void init(Store<AppState> store) {
+  void _init(Store<AppState> store) {
     if (widget.movement != null) {
       _nameController = new TextEditingController(text: widget.movement.name);
       _sumController = new TextEditingController(
@@ -37,9 +37,16 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
   }
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _sumController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, EditViewModel>(
-      onInit: init,
+      onInit: _init,
       converter: (store) {
         return EditViewModel(
           state: store.state.editState,
@@ -76,12 +83,12 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
         );
       },
       builder: (BuildContext context, EditViewModel vm) {
-        return getView(context, vm);
+        return _getView(context, vm);
       },
     );
   }
 
-  Widget getView(BuildContext context, EditViewModel vm) {
+  Widget _getView(BuildContext context, EditViewModel vm) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -89,95 +96,100 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         titleSpacing: 0,
-        title: Text(getTitle(),
+        title: Text(_getTitle(),
             style: TextStyle(
               fontFamily: "SFPro",
               fontSize: 18,
               fontWeight: FontWeight.w600,
               color: Colors.white,
             )),
-        actions: getActions(vm),
+        actions: _getActions(vm),
         elevation: 0,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(91, 122, 229, 1),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        constraints: BoxConstraints.expand(),
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(left: 16, right: 16, top: 20),
-              child: TextFormField(
-                controller: _nameController,
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: Color.fromRGBO(238, 238, 238, 1),
-                ),
-                decoration: InputDecoration(
-                  enabledBorder: new UnderlineInputBorder(
-                    borderSide:
-                        new BorderSide(color: Color.fromRGBO(178, 194, 250, 1)),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: TextFormField(
-                controller: _sumController,
-                inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: Color.fromRGBO(238, 238, 238, 1),
-                ),
-                decoration: InputDecoration(
-                  enabledBorder: new UnderlineInputBorder(
-                    borderSide:
-                        new BorderSide(color: Color.fromRGBO(178, 194, 250, 1)),
-                  ),
-                ),
-              ),
-            ),
-            Expanded(child: Container()),
-            InkWell(
-              child: Container(
-                width: double.infinity,
-                padding: EdgeInsets.symmetric(vertical: 16),
-                margin: EdgeInsets.only(left: 20, right: 20, bottom: 16),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(16)),
-                ),
-                child: Text(
-                  "Сохранить",
-                  style: TextStyle(
-                    fontFamily: "SFPro",
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    color: Color.fromRGBO(91, 122, 229, 1),
-                  ),
-                ),
-              ),
-              onTap: vm.onSave,
-            ),
-          ],
-        ),
-      ),
+      body: _getBody(vm),
       backgroundColor: Theme.of(context).primaryColor,
     );
   }
 
-  String getTitle() {
+  Widget _getBody(EditViewModel vm) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(91, 122, 229, 1),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      constraints: BoxConstraints.expand(),
+      child: Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.only(left: 16, right: 16, top: 20),
+            child: TextFormField(
+              controller: _nameController,
+              style: TextStyle(
+                fontFamily: "SFPro",
+                fontSize: 16,
+                fontWeight: FontWeight.w300,
+                color: Color.fromRGBO(238, 238, 238, 1),
+              ),
+              decoration: InputDecoration(
+                enabledBorder: new UnderlineInputBorder(
+                  borderSide:
+                      new BorderSide(color: Color.fromRGBO(178, 194, 250, 1)),
+                ),
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: TextFormField(
+              controller: _sumController,
+              inputFormatters: [WhitelistingTextInputFormatter.digitsOnly],
+              style: TextStyle(
+                fontFamily: "SFPro",
+                fontSize: 16,
+                fontWeight: FontWeight.w300,
+                color: Color.fromRGBO(238, 238, 238, 1),
+              ),
+              decoration: InputDecoration(
+                enabledBorder: new UnderlineInputBorder(
+                  borderSide:
+                      new BorderSide(color: Color.fromRGBO(178, 194, 250, 1)),
+                ),
+              ),
+            ),
+          ),
+          Expanded(child: Container()),
+          _getSaveButton(vm),
+        ],
+      ),
+    );
+  }
+
+  Widget _getSaveButton(EditViewModel vm) {
+    return InkWell(
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 16),
+        margin: EdgeInsets.only(left: 20, right: 20, bottom: 16),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        child: Text(
+          "Сохранить",
+          style: TextStyle(
+            fontFamily: "SFPro",
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Color.fromRGBO(91, 122, 229, 1),
+          ),
+        ),
+      ),
+      onTap: vm.onSave,
+    );
+  }
+
+  String _getTitle() {
     switch (widget.mode) {
       case EditScreenMode.CREATE:
         return "Создание";
@@ -188,16 +200,16 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
     }
   }
 
-  List<Widget> getActions(EditViewModel vm) {
+  List<Widget> _getActions(EditViewModel vm) {
     if (widget.mode == EditScreenMode.CREATE) {
       return new List();
     }
     return <Widget>[
       IconButton(
-          icon: Image.asset("assets/images/delete.png",
-              width: 20.0, height: 20.0),
-          onPressed: vm.onDelete,
-        ),
+        icon:
+            Image.asset("assets/images/delete.png", width: 20.0, height: 20.0),
+        onPressed: vm.onDelete,
+      ),
     ];
   }
 }

@@ -11,21 +11,21 @@ class EditMiddleware extends MiddlewareClass<AppState> {
   void call(Store<AppState> store, action, NextDispatcher next) async {
     if (action is CreateMovement) {
       try {
-        await createMovement(action);
+        await _createMovement(action);
         action.onComplete();
       } catch (e) {
         action.onError("Ошибка при создании записи");
       }
     } else if (action is EditMovement) {
       try {
-        await editMovement(action);
+        await _editMovement(action);
         action.onComplete();
       } catch (e) {
         action.onError("Ошибка при обновлении записи");
       }
     } else if (action is DeleteMovement) {
       try {
-        await deleteMovement(action);
+        await _deleteMovement(action);
         action.onComplete();
       } catch (e) {
         action.onError("Ошибка при удалении записи");
@@ -35,7 +35,7 @@ class EditMiddleware extends MiddlewareClass<AppState> {
     }
   }
 
-  Future<int> createMovement(CreateMovement action) async {
+  Future<int> _createMovement(CreateMovement action) async {
     Month month = await DBProvider.db.getMonth(action.month.id);
     if (month == null) {
       await DBProvider.db.addMonth(action.month);
@@ -50,11 +50,11 @@ class EditMiddleware extends MiddlewareClass<AppState> {
     return DBProvider.db.addMonthMovement(movement);
   }
 
-  Future<int> editMovement(EditMovement action) async {
+  Future<int> _editMovement(EditMovement action) async {
     return DBProvider.db.updateMonthMovement(action.movement);
   }
 
-  Future<int> deleteMovement(DeleteMovement action) async {
+  Future<int> _deleteMovement(DeleteMovement action) async {
     return DBProvider.db.deleteMonthMovement(action.movement.id);
   }
 }

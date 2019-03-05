@@ -35,20 +35,20 @@ class _MainScreenState extends BaseScreenState<MainScreen>
       converter: (store) {
         return MainViewModel(
           state: store.state.mainState,
-          onOpenInfoScreen: () => openInfoScreen(store),
-          onOpenCalcScreen: (day) => openCalcScreen(store, day),
+          onOpenInfoScreen: () => _openInfoScreen(store),
+          onOpenCalcScreen: (day) => _openCalcScreen(store, day),
           onPageChange: (index) {
             store.dispatch(new SetCurrentPage(currentPage: index));
           },
         );
       },
       builder: (BuildContext context, MainViewModel vm) {
-        return getView(context, vm);
+        return _getView(context, vm);
       },
     );
   }
 
-  Widget getView(BuildContext context, MainViewModel vm) {
+  Widget _getView(BuildContext context, MainViewModel vm) {
     if (vm.state.months != null && _tabController == null) {
       _tabController = TabController(
         length: vm.state.months.length,
@@ -66,14 +66,14 @@ class _MainScreenState extends BaseScreenState<MainScreen>
             onPressed: vm.onOpenInfoScreen),
         titleSpacing: 0,
         elevation: 0,
-        title: getTabBar(vm),
-        bottom: getBottomBarLine(),
+        title: _getTabBar(vm),
+        bottom: _getBottomBarLine(),
       ),
-      body: getTabView(vm),
+      body: _getTabView(vm),
     );
   }
 
-  Widget getTabView(MainViewModel vm) {
+  Widget _getTabView(MainViewModel vm) {
     if (vm.state.months == null) {
       return null;
     }
@@ -91,7 +91,7 @@ class _MainScreenState extends BaseScreenState<MainScreen>
     );
   }
 
-  Widget getTabBar(MainViewModel vm) {
+  Widget _getTabBar(MainViewModel vm) {
     if (vm.state.months == null) {
       return null;
     }
@@ -144,7 +144,7 @@ class _MainScreenState extends BaseScreenState<MainScreen>
         tabs: tabs);
   }
 
-  Widget getBottomBarLine() {
+  Widget _getBottomBarLine() {
     return PreferredSize(
         child: Container(
           color: Color.fromRGBO(178, 194, 250, 1),
@@ -153,7 +153,7 @@ class _MainScreenState extends BaseScreenState<MainScreen>
         preferredSize: Size.fromHeight(0.5));
   }
 
-  void openCalcScreen(Store<AppState> store, Day day) async {
+  void _openCalcScreen(Store<AppState> store, Day day) async {
     MainState state = store.state.mainState;
     await openScreen(new CalcScreen(
       day: day,
@@ -161,7 +161,7 @@ class _MainScreenState extends BaseScreenState<MainScreen>
     store.dispatch(new LoadMonths(currentPage: state.currentPage));
   }
 
-  void openInfoScreen(Store<AppState> store) async {
+  void _openInfoScreen(Store<AppState> store) async {
     MainState state = store.state.mainState;
     await openScreen(new MonthInfoScreen(
       month: state.months[state.currentPage],

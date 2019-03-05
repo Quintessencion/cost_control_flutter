@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:redux/redux.dart';
 import 'package:flutter_redux/flutter_redux.dart';
 import 'package:cost_control/baseScreenState.dart';
+import 'package:cost_control/utils/moneyUtils.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/view_models/monthInfoViewModel.dart';
-import 'package:cost_control/redux/states/monthInfoState.dart';
 import 'package:cost_control/redux/actions/monthInfoActions.dart';
 import 'package:cost_control/views/incomesFragment.dart';
 import 'package:cost_control/views/expensesFragment.dart';
@@ -27,6 +27,12 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
   TabController _tabController;
 
   @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, MonthInfoViewModel>(
       onInit: (store) {
@@ -36,8 +42,8 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
       converter: (store) {
         return MonthInfoViewModel(
           state: store.state.monthInfoState,
-          onAdd: () => openEditScreenAsCreate(store),
-          onEdit: (movement) => openEditScreenAsEdit(store, movement),
+          onAdd: () => _openEditScreenAsCreate(store),
+          onEdit: (movement) => _openEditScreenAsEdit(store, movement),
           onChangeAccumulationPercent: (percent) {
             store.dispatch(new SaveAccumulationPercent(
               month: store.state.monthInfoState.month,
@@ -47,17 +53,12 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
         );
       },
       builder: (BuildContext context, MonthInfoViewModel vm) {
-        return getView(context, vm);
+        return _getView(context, vm);
       },
     );
   }
 
-  Widget getView(BuildContext context, MonthInfoViewModel vm) {
-    double height = 50.0 *
-        max(vm.state.month.incomes.length + 1,
-            vm.state.month.expenses.length + 2);
-    height += 99;
-
+  Widget _getView(BuildContext context, MonthInfoViewModel vm) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -81,112 +82,127 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
         ],
         elevation: 0,
       ),
-      body: Container(
-        decoration: BoxDecoration(
-          color: Color.fromRGBO(91, 122, 229, 1),
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(24),
-            topRight: Radius.circular(24),
-          ),
-        ),
-        constraints: BoxConstraints.expand(),
-        child: SingleChildScrollView(
-          child: Column(
-            children: <Widget>[
-              ListView.separated(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: 4,
-                separatorBuilder: (BuildContext context, int i) {
-                  return Container(
-                    constraints: BoxConstraints.expand(height: 0.5),
-                    color: Color.fromRGBO(122, 149, 242, 1),
-                  );
-                },
-                itemBuilder: (context, index) {
-                  return [
-                    getLine("Доход", vm.state.month.budget),
-                    getLine("Бюджет на день", vm.state.month.dayBudget),
-                    getLine(
-                        "Накопление в месяц", vm.state.month.monthAccumulation),
-                    getLine("Накопление в год", vm.state.month.yearAccumulation)
-                  ][index];
-                },
-              ),
-              Container(
-                margin: EdgeInsets.only(left: 20, right: 20, bottom: 36),
-                constraints: BoxConstraints.expand(height: height),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(24),
-                  ),
-                ),
-                child: Column(
-                  children: <Widget>[
-                    TabBar(
-                      controller: _tabController,
-                      indicatorColor: Color.fromRGBO(244, 93, 1, 1),
-                      indicatorWeight: 2.0,
-                      labelStyle: TextStyle(
-                        fontFamily: "SFPro",
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      labelColor: Color.fromRGBO(244, 93, 1, 1),
-                      unselectedLabelColor: Color.fromRGBO(205, 205, 205, 1),
-                      tabs: <Widget>[
-                        Tab(text: "ДОХОД"),
-                        Tab(text: "РАСХОД"),
-                      ],
-                    ),
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: <Widget>[
-                          IncomesFragment(vm.state.month,
-                              onEditIncome: vm.onEdit),
-                          ExpensesFragment(
-                            vm.state.month,
-                            onEditExpense: vm.onEdit,
-                            onChangeAccumulationPercent:
-                                vm.onChangeAccumulationPercent,
-                          ),
-                        ],
-                      ),
-                    ),
-                    Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        child: Container(
-                          width: double.maxFinite,
-                          alignment: Alignment.center,
-                          padding: EdgeInsets.symmetric(vertical: 16),
-                          child: Text(
-                            "Добавить",
-                            style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 16,
-                              fontWeight: FontWeight.w300,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                          ),
-                        ),
-                        onTap: vm.onAdd,
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ),
+      body: _getBody(vm),
       backgroundColor: Theme.of(context).primaryColor,
     );
   }
 
-  Widget getLine(String header, double value) {
+  Widget _getBody(MonthInfoViewModel vm) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Color.fromRGBO(91, 122, 229, 1),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      constraints: BoxConstraints.expand(),
+      child: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            _getStatistics(vm),
+            _getMovementView(vm),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _getMovementView(MonthInfoViewModel vm) {
+    double height = 50.0 *
+        max(vm.state.month.incomes.length + 1,
+            vm.state.month.expenses.length + 2);
+    height += 99;
+
+    return Container(
+      margin: EdgeInsets.only(left: 20, right: 20, bottom: 36),
+      constraints: BoxConstraints.expand(height: height),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.all(
+          Radius.circular(24),
+        ),
+      ),
+      child: Column(
+        children: <Widget>[
+          TabBar(
+            controller: _tabController,
+            indicatorColor: Color.fromRGBO(244, 93, 1, 1),
+            indicatorWeight: 2.0,
+            labelStyle: TextStyle(
+              fontFamily: "SFPro",
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+            labelColor: Color.fromRGBO(244, 93, 1, 1),
+            unselectedLabelColor: Color.fromRGBO(205, 205, 205, 1),
+            tabs: <Widget>[
+              Tab(text: "ДОХОД"),
+              Tab(text: "РАСХОД"),
+            ],
+          ),
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: <Widget>[
+                IncomesFragment(vm.state.month, onEditIncome: vm.onEdit),
+                ExpensesFragment(
+                  vm.state.month,
+                  onEditExpense: vm.onEdit,
+                  onChangeAccumulationPercent: vm.onChangeAccumulationPercent,
+                ),
+              ],
+            ),
+          ),
+          _getAddButton(vm),
+        ],
+      ),
+    );
+  }
+
+  Widget _getAddButton(MonthInfoViewModel vm) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        child: Container(
+          width: double.maxFinite,
+          alignment: Alignment.center,
+          padding: EdgeInsets.symmetric(vertical: 16),
+          child: Text(
+            "Добавить",
+            style: TextStyle(
+              fontFamily: "SFPro",
+              fontSize: 16,
+              fontWeight: FontWeight.w300,
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+        ),
+        onTap: vm.onAdd,
+      ),
+    );
+  }
+
+  Widget _getStatistics(MonthInfoViewModel vm) {
+    return ListView.separated(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      itemCount: 4,
+      separatorBuilder: (BuildContext context, int i) {
+        return Container(
+          constraints: BoxConstraints.expand(height: 0.5),
+          color: Color.fromRGBO(122, 149, 242, 1),
+        );
+      },
+      itemBuilder: (context, index) {
+        return [
+          _getLine("Доход", vm.state.month.budget),
+          _getLine("Бюджет на день", vm.state.month.dayBudget),
+          _getLine("Накопление в месяц", vm.state.month.monthAccumulation),
+          _getLine("Накопление в год", vm.state.month.yearAccumulation)
+        ][index];
+      },
+    );
+  }
+
+  Widget _getLine(String header, double value) {
     return Padding(
       padding: EdgeInsets.only(top: 20, bottom: 16, left: 20, right: 20),
       child: Row(
@@ -202,7 +218,7 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
           ),
           Expanded(child: Container()),
           Text(
-            value.round().toString(),
+            MoneyUtils.standard(value),
             style: TextStyle(
               fontFamily: "SFPro",
               fontSize: 20,
@@ -223,7 +239,7 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
     );
   }
 
-  void openEditScreenAsEdit(Store<AppState> store, MonthMovement movement) {
+  void _openEditScreenAsEdit(Store<AppState> store, MonthMovement movement) {
     openScreen(new EditScreen(
       mode: EditScreenMode.EDIT,
       movement: movement,
@@ -232,7 +248,7 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
     });
   }
 
-  void openEditScreenAsCreate(Store<AppState> store) {
+  void _openEditScreenAsCreate(Store<AppState> store) {
     int direction = 1 - _tabController.index * 2;
     openScreen(new EditScreen(
       mode: EditScreenMode.CREATE,

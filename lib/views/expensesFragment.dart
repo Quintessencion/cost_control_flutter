@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
+import 'package:cost_control/utils/moneyUtils.dart';
 import 'package:cost_control/views/baseMonthInfoFragment.dart';
 import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/monthMovement.dart';
@@ -17,7 +18,8 @@ class ExpensesFragment extends BaseMonthInfoFragment {
     this.onEditExpense,
     this.onChangeAccumulationPercent,
   }) {
-    _controller = new TextEditingController(text: _month.accumulationPercentage.toString());
+    _controller = new TextEditingController(
+        text: _month.accumulationPercentage.toString());
     _focus = FocusNode();
   }
 
@@ -127,7 +129,7 @@ class ExpensesFragment extends BaseMonthInfoFragment {
                 ),
                 Expanded(child: Container()),
                 Text(
-                  _month.monthExpensesSum.round().toString(),
+                  MoneyUtils.standard(_month.monthExpensesSum),
                   style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 18,

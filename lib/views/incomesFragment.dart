@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:cost_control/utils/moneyUtils.dart';
 import 'package:cost_control/entities/monthMovement.dart';
 import 'package:cost_control/views/baseMonthInfoFragment.dart';
 import 'package:cost_control/entities/month.dart';
@@ -59,7 +60,7 @@ class IncomesFragment extends BaseMonthInfoFragment {
                 ),
                 Expanded(child: Container()),
                 Text(
-                  _month.monthIncomesSum.round().toString(),
+                  MoneyUtils.standard(_month.monthIncomesSum),
                   style: TextStyle(
                     fontFamily: "SFPro",
                     fontSize: 18,
