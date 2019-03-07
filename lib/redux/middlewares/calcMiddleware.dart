@@ -16,12 +16,18 @@ class CalcMiddleware extends MiddlewareClass<AppState> {
       day.expenses.clear();
       for (CalcItem expense in expenses) {
         if (!expense.isEmpty()) {
+          double cost;
+          if (expense.value.isNotEmpty) {
+            cost = double.parse(expense.value);
+          } else {
+            cost = 0;
+          }
           day.expenses.add(Expense(
             id: Uuid().v1(),
             year: day.parent.yearNumber,
             month: day.parent.number,
             day: day.number,
-            cost: double.parse(expense.value),
+            cost: cost,
             description: expense.description,
           ));
         }

@@ -154,11 +154,9 @@ class _MainScreenState extends BaseScreenState<MainScreen>
   }
 
   void _openCalcScreen(Store<AppState> store, Day day) async {
-    MainState state = store.state.mainState;
     await openScreen(new CalcScreen(
       day: day,
     ));
-    store.dispatch(new LoadMonths(currentPage: state.currentPage));
   }
 
   void _openInfoScreen(Store<AppState> store) async {

@@ -2,28 +2,30 @@ import 'package:cost_control/entities/day.dart';
 
 class AddSymbol {
   final String symbol;
+  final Function(int newCurrentTab) onChangeTab;
 
-  AddSymbol({this.symbol});
+  AddSymbol({this.symbol, this.onChangeTab});
 }
 
 class DeleteSymbol {}
 
 class ChangeDescription {
   final String description;
+  final Function(int newCurrentTab) onChangeTab;
 
-  ChangeDescription({this.description});
+  ChangeDescription({this.description, this.onChangeTab});
 }
 
-class SetCurrentPage {
-  final int currentPage;
+class SetCurrentTab {
+  final int currentTab;
 
-  SetCurrentPage({this.currentPage});
+  SetCurrentTab({this.currentTab});
 }
 
-class DeleteCurrentPage {
-  final Function(int newCurrentPage) onComplete;
+class DeleteCurrentTab {
+  final Function(int newCurrentTab) onComplete;
 
-  DeleteCurrentPage({this.onComplete});
+  DeleteCurrentTab({this.onComplete});
 }
 
 class InitState {
@@ -39,3 +41,5 @@ class SaveDay {
 
   SaveDay({this.day, this.onComplete, this.onError});
 }
+
+class ClearFocus {}

@@ -6,6 +6,8 @@ import 'package:cost_control/redux/store.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/screens/mainScreen.dart';
 
+final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 void main() => runApp(MyApp(prepareStore()));
 
 class MyApp extends StatelessWidget {
@@ -29,6 +31,7 @@ class MyApp extends StatelessWidget {
         ],
         supportedLocales: [Locale('ru', 'RUS')],
         home: MainScreen(),
+        navigatorObservers: [routeObserver],
       ),
     );
   }

@@ -15,14 +15,23 @@ final calcReducer = combineReducers<CalcState>([
         description: e.description,
       );
     }).toList();
-    state.expenses.add(CalcItem());
+    state.currentPage = 0;
+    state.expenses.insert(0, CalcItem());
     return state;
   }),
   TypedReducer<CalcState, AddSymbol>((state, action) {
+    bool isChangedPage = false;
+    if (state.currentPage == 0) {
+      state.expenses.insert(0, CalcItem());
+      state.currentPage++;
+      isChangedPage = true;
+    }
     CalcItem item = state.expenses[state.currentPage];
     item.expression += action.symbol;
     item.value = _evaluate(item.expression);
-    _checkOnNeedAddItem(state);
+    if (isChangedPage) {
+      action.onChangeTab(state.currentPage);
+    }
     return state;
   }),
   TypedReducer<CalcState, DeleteSymbol>((state, action) {
@@ -34,24 +43,38 @@ final calcReducer = combineReducers<CalcState>([
     item.value = _evaluate(item.expression);
     return state;
   }),
-  TypedReducer<CalcState, SetCurrentPage>((state, action) {
-    state.currentPage = action.currentPage;
+  TypedReducer<CalcState, SetCurrentTab>((state, action) {
+    state.currentPage = action.currentTab;
     return state;
   }),
   TypedReducer<CalcState, ChangeDescription>((state, action) {
+    bool isChangedPage = false;
+    if (state.currentPage == 0) {
+      state.expenses.insert(0, CalcItem());
+      state.currentPage++;
+      isChangedPage = true;
+    }
     CalcItem item = state.expenses[state.currentPage];
     item.description = action.description;
-    _checkOnNeedAddItem(state);
+    if (isChangedPage) {
+      action.onChangeTab(state.currentPage);
+    }
     return state;
   }),
-  TypedReducer<CalcState, DeleteCurrentPage>((state, action) {
+  TypedReducer<CalcState, DeleteCurrentTab>((state, action) {
     List<CalcItem> items = state.expenses;
-    if (state.currentPage != items.length - 1) {
+    if (state.currentPage != 0) {
       items.removeAt(state.currentPage);
-      if (state.currentPage > 0) {
-        state.currentPage--;
+      if (state.currentPage < items.length - 1) {
+        state.currentPage++;
       }
       action.onComplete(state.currentPage);
+    }
+    return state;
+  }),
+  TypedReducer<CalcState, ClearFocus>((state, action) {
+    for (CalcItem item in state.expenses) {
+      item.hashFocus = false;
     }
     return state;
   }),
@@ -72,15 +95,11 @@ String _evaluate(String str) {
     Parser p = new Parser();
     Expression e = p.parse(str);
     double evaluated = e.evaluate(EvaluationType.REAL, ContextModel());
+    if (evaluated == double.infinity) {
+      return "";
+    }
     return MoneyUtils.twoDigits(evaluated);
   } catch (e) {
     return "";
-  }
-}
-
-void _checkOnNeedAddItem(CalcState state) {
-  CalcItem lastItem = state.expenses.last;
-  if (!lastItem.isEmpty()) {
-    state.expenses.add(CalcItem());
   }
 }

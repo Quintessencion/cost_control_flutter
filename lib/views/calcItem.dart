@@ -13,21 +13,30 @@ class CalcItemView extends StatefulWidget {
 
 class _CalcItemViewState extends State<CalcItemView> {
   TextEditingController _controller;
+  FocusNode _focusNode = new FocusNode();
 
   @override
   void initState() {
     _controller = new TextEditingController(text: widget.item.description);
+    _focusNode.addListener(() {
+      widget.item.hashFocus = _focusNode.hasFocus;
+    });
     super.initState();
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (widget.item.hashFocus) {
+      FocusScope.of(context).requestFocus(_focusNode);
+    }
+    _controller.text = widget.item.description;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[
@@ -35,6 +44,7 @@ class _CalcItemViewState extends State<CalcItemView> {
           padding: EdgeInsets.only(top: 8, left: 20, right: 20),
           child: TextField(
             controller: _controller,
+            focusNode: _focusNode,
             style: TextStyle(
               fontFamily: "SFPro",
               fontSize: 16,

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_redux/flutter_redux.dart';
+import 'package:cost_control/main.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/view_models/calcViewModel.dart';
 import 'package:cost_control/redux/actions/calcActions.dart';
+import 'package:cost_control/redux/actions/mainActions.dart';
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/baseScreenState.dart';
 import 'package:cost_control/utils/timeUtils.dart';
@@ -18,40 +20,85 @@ class CalcScreen extends StatefulWidget {
 }
 
 class _CalcScreenState extends BaseScreenState<CalcScreen>
-    with TickerProviderStateMixin {
-  TabController _tabController;
+    with TickerProviderStateMixin, WidgetsBindingObserver, RouteAware {
+  void Function() onClose;
+  PageController _tabController;
+  bool isPageChanged = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    routeObserver.subscribe(this, ModalRoute.of(context));
+  }
 
   @override
   void dispose() {
+    routeObserver.unsubscribe(this);
+    WidgetsBinding.instance.removeObserver(this);
     _tabController.dispose();
     super.dispose();
+  }
+
+  @override
+  void didPop() {
+    if (onClose != null) {
+      onClose();
+    }
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.inactive && onClose != null) {
+      onClose();
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return StoreConnector<AppState, CalcViewModel>(
       onInit: (store) {
+        WidgetsBinding.instance.addObserver(this);
         store.dispatch(InitState(day: widget.day));
-        _tabController = TabController(
-          length: 100,
-          vsync: this,
-        );
-        _tabController.addListener(() =>
-            store.dispatch(SetCurrentPage(currentPage: _tabController.index)));
+        _tabController = PageController();
+        onClose = () {
+          store.dispatch(SaveDay(
+            day: widget.day,
+            onComplete: () {
+              store.dispatch(new LoadMonths(
+                  currentPage: store.state.mainState.currentPage));
+            },
+            onError: showToast,
+          ));
+        };
       },
       converter: (store) {
         return CalcViewModel(
             state: store.state.calcState,
-            onAddSymbol: (symbol) => store.dispatch(AddSymbol(symbol: symbol)),
+            onAddSymbol: (symbol) => store.dispatch(AddSymbol(
+                symbol: symbol,
+                onChangeTab: (index) {
+                  isPageChanged = true;
+                  _tabController.jumpToPage(index);
+                })),
             onDeleteSymbol: () => store.dispatch(DeleteSymbol()),
-            onPageChange: (index) =>
-                store.dispatch(SetCurrentPage(currentPage: index)),
-            onChangeDescription: (str) =>
-                store.dispatch(ChangeDescription(description: str)),
+            onPageChange: (index) {
+              store.dispatch(SetCurrentTab(currentTab: index));
+              if (!isPageChanged) {
+                store.dispatch(ClearFocus());
+                FocusScope.of(context).requestFocus(FocusNode());
+              }
+              isPageChanged = false;
+            },
+            onChangeDescription: (str) => store.dispatch(ChangeDescription(
+                description: str,
+                onChangeTab: (index) {
+                  isPageChanged = true;
+                  _tabController.jumpToPage(index);
+                })),
             onDeleteItem: () {
-              store.dispatch(DeleteCurrentPage(onComplete: (index) {
-                _tabController.animateTo(index);
-                _tabController.notifyListeners();
+              store.dispatch(DeleteCurrentTab(onComplete: (index) {
+                isPageChanged = true;
+                _tabController.jumpToPage(index);
               }));
             },
             onSave: () {
@@ -73,7 +120,7 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back_ios),
-          onPressed: vm.onSave,
+          onPressed: () => Navigator.pop(context),
         ),
         actions: <Widget>[
           IconButton(
@@ -141,8 +188,9 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
 
   Widget _getTabs(CalcViewModel vm) {
     return Container(
-      child: TabBarView(
+      child: PageView(
           controller: _tabController,
+          onPageChanged: vm.onPageChange,
           children: vm.state.expenses.map((exp) {
             return CalcItemView(
               item: exp,
