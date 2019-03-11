@@ -42,6 +42,10 @@ class _MainScreenState extends BaseScreenState<MainScreen>
           onPageChange: (index) {
             store.dispatch(new SetCurrentPage(currentPage: index));
           },
+          onFirstSession: () {
+            store.dispatch(SetFirstScreenVisibility(visibility: false));
+            _openInfoScreen(store);
+          },
         );
       },
       builder: (BuildContext context, MainViewModel vm) {
@@ -60,133 +64,143 @@ class _MainScreenState extends BaseScreenState<MainScreen>
       _tabController.addListener(() => vm.onPageChange(_tabController.index));
     }
 
+    List<Widget> layers = new List();
+    layers.add(Scaffold(
+      appBar: AppBar(
+        leading: IconButton(
+            icon: Image.asset("assets/images/dollar.png",
+                width: 26.0, height: 26.0),
+            onPressed: vm.onOpenInfoScreen),
+        titleSpacing: 0,
+        elevation: 0,
+        title: _getTabBar(vm),
+        bottom: _getBottomBarLine(),
+      ),
+      body: _getTabView(vm),
+    ));
+    if (vm.state.firstSession) {
+      layers.add(_getFirstSessionScreen(vm));
+    }
+
     return Stack(
-      children: <Widget>[
-        Scaffold(
-          appBar: AppBar(
-            leading: IconButton(
-                icon: Image.asset("assets/images/dollar.png",
-                    width: 26.0, height: 26.0),
-                onPressed: vm.onOpenInfoScreen),
-            titleSpacing: 0,
-            elevation: 0,
-            title: _getTabBar(vm),
-            bottom: _getBottomBarLine(),
-          ),
-          body: _getTabView(vm),
-        ),
-        Scaffold(
-          backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
-          body: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
-            child: Container(
-              constraints: BoxConstraints.expand(),
-              decoration: BoxDecoration(color: Colors.transparent),
-              child: SafeArea(
-                child: Stack(
-                  children: <Widget>[
-                    Padding(
-                      padding: EdgeInsets.only(left: 12, top: 8, right: 12),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Container(
-                            width: 42,
-                            height: 70,
-                            decoration: BoxDecoration(
-                              color: Color.fromRGBO(91, 122, 229, 1),
-                              borderRadius: BorderRadius.vertical(
-                                top: Radius.circular(21),
-                              ),
-                            ),
+      children: layers,
+    );
+  }
+
+  Widget _getFirstSessionScreen(MainViewModel vm) {
+    return Scaffold(
+      backgroundColor: Color.fromRGBO(0, 0, 0, 0.5),
+      body: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+        child: Container(
+          constraints: BoxConstraints.expand(),
+          decoration: BoxDecoration(color: Colors.transparent),
+          child: SafeArea(
+            child: Stack(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(left: 12, top: 8, right: 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        width: 42,
+                        height: 70,
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(91, 122, 229, 1),
+                          borderRadius: BorderRadius.vertical(
+                            top: Radius.circular(21),
                           ),
-                          Container(
-                            width: double.infinity,
-                            decoration: BoxDecoration(
-                              color: Color.fromRGBO(91, 122, 229, 1),
-                              borderRadius: BorderRadius.only(
-                                topRight: Radius.circular(21),
-                                bottomLeft: Radius.circular(21),
-                                bottomRight: Radius.circular(21),
-                              ),
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 36, top: 24, right: 36),
-                                  child: Text(
-                                    "Добро пожаловать!",
-                                    style: TextStyle(
-                                      fontFamily: "SFPro",
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 36, top: 20, right: 36, bottom: 32),
-                                  child: Text(
-                                    "Для того, чтобы начать пользоваться нашим приложением, "
-                                        "нужно заполнить свои данные о расходах и доходах.\n\n"
-                                        "Нажмите на этот значок, чтобы  перейти в меню.",
-                                    style: TextStyle(
-                                      fontFamily: "SFPro",
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w300,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Color.fromRGBO(91, 122, 229, 1),
+                          borderRadius: BorderRadius.only(
+                            topRight: Radius.circular(21),
+                            bottomLeft: Radius.circular(21),
+                            bottomRight: Radius.circular(21),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Padding(
+                              padding:
+                                  EdgeInsets.only(left: 36, top: 24, right: 36),
+                              child: Text(
+                                "Добро пожаловать!",
+                                style: TextStyle(
+                                  fontFamily: "SFPro",
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  left: 36, top: 20, right: 36, bottom: 32),
+                              child: Text(
+                                "Для того, чтобы начать пользоваться нашим приложением, "
+                                    "нужно заполнить свои данные о расходах и доходах.\n\n"
+                                    "Нажмите на этот значок, чтобы  перейти в меню.",
+                                style: TextStyle(
+                                  fontFamily: "SFPro",
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w300,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: vm.onFirstSession,
+                  child: Container(
+                    width: 44,
+                    height: 44,
+                    margin: EdgeInsets.only(left: 11, top: 6),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white,
                     ),
-                    Container(
-                      width: 44,
-                      height: 44,
-                      margin: EdgeInsets.only(left: 11, top: 6),
+                    child: Container(
+                      margin: EdgeInsets.all(9),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white,
+                        color: Color.fromRGBO(91, 122, 229, 1),
                       ),
                       child: Container(
-                        margin: EdgeInsets.all(9),
+                        margin: EdgeInsets.all(3),
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: Color.fromRGBO(91, 122, 229, 1),
+                          color: Colors.white,
                         ),
-                        child: Container(
-                          margin: EdgeInsets.all(3),
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.white,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "₽",
-                            style: TextStyle(
-                              fontFamily: "SFPro",
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                              color: Color.fromRGBO(91, 122, 229, 1),
-                            ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "₽",
+                          style: TextStyle(
+                            fontFamily: "SFPro",
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Color.fromRGBO(91, 122, 229, 1),
                           ),
                         ),
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
           ),
         ),
-      ],
+      ),
     );
   }
 

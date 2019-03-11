@@ -63,22 +63,28 @@ class _CalcItemViewState extends State<CalcItemView> {
           ),
         ),
         Expanded(child: Container()),
-        Text(
-          MoneyUtils.calc(widget.item.value),
-          style: TextStyle(
-            fontFamily: "SFPro",
-            fontSize: 78,
-            fontWeight: FontWeight.w300,
-            color: Colors.white,
+        Padding(
+          padding: EdgeInsets.only(right: 20),
+          child: Text(
+            MoneyUtils.calc(widget.item.value),
+            style: TextStyle(
+              fontFamily: "SFPro",
+              fontSize: 78,
+              fontWeight: FontWeight.w300,
+              color: Colors.white,
+            ),
           ),
         ),
-        Text(
-          widget.item.expression,
-          style: TextStyle(
-            fontFamily: "SFPro",
-            fontSize: 28,
-            fontWeight: FontWeight.w100,
-            color: Colors.white,
+        Padding(
+          padding: EdgeInsets.only(right: 20),
+          child: Text(
+            widget.item.expression,
+            style: TextStyle(
+              fontFamily: "SFPro",
+              fontSize: 28,
+              fontWeight: FontWeight.w100,
+              color: Colors.white,
+            ),
           ),
         ),
         Expanded(child: Container()),

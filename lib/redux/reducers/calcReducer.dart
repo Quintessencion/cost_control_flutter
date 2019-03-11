@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:redux/redux.dart';
 import 'package:math_expressions/math_expressions.dart';
 import 'package:cost_control/utils/moneyUtils.dart';
@@ -54,9 +55,13 @@ final calcReducer = combineReducers<CalcState>([
     List<CalcItem> items = state.expenses;
     if (state.currentPage != 0) {
       items.removeAt(state.currentPage);
+      if (state.currentPage == 1) {
+
+      }
       if (state.currentPage < items.length - 1) {
         state.currentPage++;
       }
+      state.currentPage = min(state.currentPage, state.expenses.length - 1);
       action.onComplete(state.currentPage);
     }
     return state;

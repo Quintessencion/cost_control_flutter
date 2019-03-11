@@ -6,11 +6,13 @@ class MainViewModel {
   final void Function() onOpenInfoScreen;
   final void Function(Day day) onOpenCalcScreen;
   final void Function(int index) onPageChange;
+  final void Function() onFirstSession;
 
   MainViewModel({
     this.state,
     this.onOpenInfoScreen,
     this.onOpenCalcScreen,
     this.onPageChange,
+    this.onFirstSession,
   });
 }
