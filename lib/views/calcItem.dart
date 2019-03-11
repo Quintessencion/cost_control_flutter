@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cost_control/entities/calcItem.dart';
+import 'package:cost_control/utils/moneyUtils.dart';
 
 class CalcItemView extends StatefulWidget {
   final CalcItem item;
@@ -63,7 +64,7 @@ class _CalcItemViewState extends State<CalcItemView> {
         ),
         Expanded(child: Container()),
         Text(
-          widget.item.value,
+          MoneyUtils.calc(widget.item.value),
           style: TextStyle(
             fontFamily: "SFPro",
             fontSize: 78,

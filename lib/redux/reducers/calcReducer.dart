@@ -8,10 +8,9 @@ import 'package:cost_control/entities/calcItem.dart';
 final calcReducer = combineReducers<CalcState>([
   TypedReducer<CalcState, InitState>((state, action) {
     state.expenses = action.day.expenses.map((e) {
-      String cost = MoneyUtils.twoDigits(e.cost);
       return CalcItem(
-        expression: cost,
-        value: cost,
+        expression: MoneyUtils.calc(e.cost),
+        value: e.cost,
         description: e.description,
       );
     }).toList();
@@ -20,12 +19,7 @@ final calcReducer = combineReducers<CalcState>([
     return state;
   }),
   TypedReducer<CalcState, AddSymbol>((state, action) {
-    bool isChangedPage = false;
-    if (state.currentPage == 0) {
-      state.expenses.insert(0, CalcItem());
-      state.currentPage++;
-      isChangedPage = true;
-    }
+    bool isChangedPage = _checkOnAddPage(state);
     CalcItem item = state.expenses[state.currentPage];
     item.expression += action.symbol;
     item.value = _evaluate(item.expression);
@@ -48,12 +42,7 @@ final calcReducer = combineReducers<CalcState>([
     return state;
   }),
   TypedReducer<CalcState, ChangeDescription>((state, action) {
-    bool isChangedPage = false;
-    if (state.currentPage == 0) {
-      state.expenses.insert(0, CalcItem());
-      state.currentPage++;
-      isChangedPage = true;
-    }
+    bool isChangedPage = _checkOnAddPage(state);
     CalcItem item = state.expenses[state.currentPage];
     item.description = action.description;
     if (isChangedPage) {
@@ -80,9 +69,9 @@ final calcReducer = combineReducers<CalcState>([
   }),
 ]);
 
-String _evaluate(String str) {
+double _evaluate(String str) {
   if (str.isEmpty) {
-    return "0";
+    return 0;
   }
   try {
     String lastChar = str[str.length - 1];
@@ -94,12 +83,17 @@ String _evaluate(String str) {
     }
     Parser p = new Parser();
     Expression e = p.parse(str);
-    double evaluated = e.evaluate(EvaluationType.REAL, ContextModel());
-    if (evaluated == double.infinity) {
-      return "";
-    }
-    return MoneyUtils.twoDigits(evaluated);
+    return e.evaluate(EvaluationType.REAL, ContextModel());
   } catch (e) {
-    return "";
+    return 0;
   }
+}
+
+bool _checkOnAddPage(CalcState state) {
+  if (state.currentPage == 0) {
+    state.expenses.insert(0, CalcItem());
+    state.currentPage++;
+    return true;
+  }
+  return false;
 }
