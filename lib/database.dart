@@ -196,6 +196,12 @@ class DBProvider {
 
   Future<int> addMonth(Month month) async {
     final db = await database;
+    for (MonthMovement movement in month.incomes) {
+      await addMonthMovement(movement);
+    }
+    for (MonthMovement movement in month.expenses) {
+      await addMonthMovement(movement);
+    }
     return db.insert("Month", month.toJson());
   }
 

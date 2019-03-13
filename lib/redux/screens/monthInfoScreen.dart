@@ -235,6 +235,7 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
   void _openEditScreenAsEdit(Store<AppState> store, MonthMovement movement) {
     openScreen(new EditScreen(
       mode: EditScreenMode.EDIT,
+      month: store.state.monthInfoState.month,
       movement: movement,
     )).then((res) {
       store.dispatch(new ReloadMonth(month: store.state.monthInfoState.month));

@@ -120,6 +120,21 @@ class Month {
     expenses = month.expenses;
   }
 
+  void addVirtualData(Month month) {
+    accumulationPercentage = month.accumulationPercentage;
+    month.incomes.forEach((inc) {
+      incomes.add(MonthMovement.copy(Uuid().v1(), id, inc));
+    });
+    month.expenses.forEach((exp) {
+      expenses.add(MonthMovement.copy(Uuid().v1(), id, exp));
+    });
+  }
+
+  int compareTo(Month other) {
+    return DateTime(yearNumber, number)
+        .compareTo(DateTime(other.yearNumber, other.number));
+  }
+
   factory Month.fromJson(Map<String, dynamic> json) => new Month.withJson(
         id: json["id"],
         yearNumber: json["yearNumber"],

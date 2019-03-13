@@ -1,14 +1,14 @@
-import 'package:tuple/tuple.dart';
-import 'package:redux/redux.dart';
-import 'package:cost_control/redux/states/appState.dart';
-import 'package:cost_control/redux/actions/mainActions.dart';
-import 'package:cost_control/entities/month.dart';
+import 'package:cost_control/database.dart';
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/entities/expense.dart';
+import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/monthMovement.dart';
-import 'package:cost_control/utils/timeUtils.dart';
+import 'package:cost_control/redux/actions/mainActions.dart';
+import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/utils/sharedPref.dart';
-import 'package:cost_control/database.dart';
+import 'package:cost_control/utils/timeUtils.dart';
+import 'package:redux/redux.dart';
+import 'package:tuple/tuple.dart';
 
 class MainMiddleware extends MiddlewareClass<AppState> {
   @override
@@ -97,11 +97,25 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     for (Month month in databaseMonths) {
       map[Tuple2(month.yearNumber, month.number)] = month;
     }
+    List<Month> empty = new List();
     for (Month month in months) {
       Month real = map[Tuple2(month.yearNumber, month.number)];
       if (real != null) {
         month.addJsonData(real);
+      } else {
+        empty.add(month);
       }
+    }
+    if (empty.isEmpty || databaseMonths.isEmpty) {
+      return;
+    }
+    databaseMonths.sort((a, b) => a.compareTo(b));
+    int i = 0;
+    for (Month month in empty) {
+      while (i + 1 < databaseMonths.length && month.compareTo(databaseMonths[i + 1]) > 0) {
+        i++;
+      }
+      month.addVirtualData(databaseMonths[i]);
     }
   }
 

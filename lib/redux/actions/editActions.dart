@@ -20,11 +20,13 @@ class CreateMovement {
 }
 
 class EditMovement {
+  final Month month;
   final MonthMovement movement;
   final void Function() onComplete;
   final void Function(String) onError;
 
   EditMovement({
+    this.month,
     this.movement,
     this.onComplete,
     this.onError,
@@ -32,11 +34,13 @@ class EditMovement {
 }
 
 class DeleteMovement {
+  final Month month;
   final MonthMovement movement;
   final void Function() onComplete;
   final void Function(String) onError;
 
   DeleteMovement({
+    this.month,
     this.movement,
     this.onComplete,
     this.onError,
