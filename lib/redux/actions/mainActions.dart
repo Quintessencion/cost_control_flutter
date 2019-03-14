@@ -18,3 +18,9 @@ class SetCurrentPage {
 
   SetCurrentPage({this.currentPage});
 }
+
+class SetFirstScreenVisibility {
+  final bool visibility;
+
+  SetFirstScreenVisibility({this.visibility});
+}

@@ -8,6 +8,7 @@ class CalcViewModel {
   final void Function(int) onPageChange;
   final void Function() onDeleteItem;
   final void Function() onSave;
+  final void Function() onDismiss;
 
   CalcViewModel({
     this.state,
@@ -17,5 +18,6 @@ class CalcViewModel {
     this.onPageChange,
     this.onDeleteItem,
     this.onSave,
+    this.onDismiss,
   });
 }

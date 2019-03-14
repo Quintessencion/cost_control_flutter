@@ -27,7 +27,7 @@ AppState _getReducers(AppState state, dynamic action) {
 
 List<Middleware<AppState>> _getMiddlewares() {
   return [
-    TypedMiddleware<AppState, LoadMonths>(MainMiddleware()),
+    MainMiddleware(),
     MonthInfoMiddleware(),
     EditMiddleware(),
     TypedMiddleware<AppState, SaveDay>(CalcMiddleware()),

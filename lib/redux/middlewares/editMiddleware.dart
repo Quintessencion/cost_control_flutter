@@ -51,10 +51,18 @@ class EditMiddleware extends MiddlewareClass<AppState> {
   }
 
   Future<int> _editMovement(EditMovement action) async {
+    Month month = await DBProvider.db.getMonth(action.month.id);
+    if (month == null) {
+      await DBProvider.db.addMonth(action.month);
+    }
     return DBProvider.db.updateMonthMovement(action.movement);
   }
 
   Future<int> _deleteMovement(DeleteMovement action) async {
+    Month month = await DBProvider.db.getMonth(action.month.id);
+    if (month == null) {
+      await DBProvider.db.addMonth(action.month);
+    }
     return DBProvider.db.deleteMonthMovement(action.movement.id);
   }
 }

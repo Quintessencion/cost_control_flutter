@@ -11,5 +11,9 @@ final mainReducer = combineReducers<MainState>([
   TypedReducer<MainState, SetCurrentPage>((state, action) {
     state.currentPage = action.currentPage;
     return state;
-  })
+  }),
+  TypedReducer<MainState, SetFirstScreenVisibility>((state, action) {
+    state.firstSession = action.visibility;
+    return state;
+  }),
 ]);

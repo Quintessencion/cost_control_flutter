@@ -73,41 +73,46 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
       },
       converter: (store) {
         return CalcViewModel(
-            state: store.state.calcState,
-            onAddSymbol: (symbol) => store.dispatch(AddSymbol(
-                symbol: symbol,
-                onChangeTab: (index) {
-                  isPageChanged = true;
-                  _tabController.jumpToPage(index);
-                })),
-            onDeleteSymbol: () => store.dispatch(DeleteSymbol()),
-            onPageChange: (index) {
-              store.dispatch(SetCurrentTab(currentTab: index));
-              if (!isPageChanged) {
-                store.dispatch(ClearFocus());
-                FocusScope.of(context).requestFocus(FocusNode());
-              }
-              isPageChanged = false;
-            },
-            onChangeDescription: (str) => store.dispatch(ChangeDescription(
-                description: str,
-                onChangeTab: (index) {
-                  isPageChanged = true;
-                  _tabController.jumpToPage(index);
-                })),
-            onDeleteItem: () {
-              store.dispatch(DeleteCurrentTab(onComplete: (index) {
+          state: store.state.calcState,
+          onAddSymbol: (symbol) => store.dispatch(AddSymbol(
+              symbol: symbol,
+              onChangeTab: (index) {
                 isPageChanged = true;
                 _tabController.jumpToPage(index);
-              }));
-            },
-            onSave: () {
-              store.dispatch(SaveDay(
-                day: widget.day,
-                onComplete: () => Navigator.pop(context),
-                onError: showToast,
-              ));
-            });
+              })),
+          onDeleteSymbol: () => store.dispatch(DeleteSymbol()),
+          onPageChange: (index) {
+            store.dispatch(SetCurrentTab(currentTab: index));
+            if (!isPageChanged) {
+              store.dispatch(ClearFocus());
+              FocusScope.of(context).requestFocus(FocusNode());
+            }
+            isPageChanged = false;
+          },
+          onChangeDescription: (str) => store.dispatch(ChangeDescription(
+              description: str,
+              onChangeTab: (index) {
+                isPageChanged = true;
+                _tabController.jumpToPage(index);
+              })),
+          onDeleteItem: () {
+            store.dispatch(DeleteCurrentTab(onComplete: (index) {
+              isPageChanged = true;
+              _tabController.jumpToPage(index);
+            }));
+          },
+          onSave: () {
+            store.dispatch(SaveDay(
+              day: widget.day,
+              onComplete: () => Navigator.pop(context),
+              onError: showToast,
+            ));
+          },
+          onDismiss: () {
+            store.dispatch(ClearFocus());
+            FocusScope.of(context).requestFocus(FocusNode());
+          },
+        );
       },
       builder: (BuildContext context, CalcViewModel vm) {
         return _getView(context, vm);
@@ -146,7 +151,10 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
         elevation: 0,
       ),
       resizeToAvoidBottomPadding: false,
-      body: _getBody(vm),
+      body: GestureDetector(
+        onTap: vm.onDismiss,
+        child: _getBody(vm),
+      ),
       backgroundColor: Theme.of(context).primaryColor,
     );
   }

@@ -59,6 +59,7 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
                 widget.movement.name = _nameController.text;
                 widget.movement.sum = _getSum();
                 store.dispatch(new EditMovement(
+                  month: widget.month,
                   movement: widget.movement,
                   onComplete: back,
                   onError: showToast,
@@ -78,6 +79,7 @@ class _EditScreenState extends BaseScreenState<EditScreen> {
           },
           onDelete: () {
             store.dispatch(new DeleteMovement(
+              month: widget.month,
               movement: widget.movement,
               onComplete: back,
               onError: showToast,

@@ -12,4 +12,11 @@ class MoneyUtils {
   static String twoDigits(double money) {
     return _twoDigits.format(money);
   }
+
+  static String calc(double money) {
+    if (money == double.infinity) {
+      return "Деление на ноль";
+    }
+    return _twoDigits.format(money);
+  }
 }

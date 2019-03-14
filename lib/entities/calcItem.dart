@@ -1,17 +1,18 @@
 class CalcItem {
+  static const double _ERROR = 0.01;
   String expression;
-  String value;
+  double value;
   String description;
   bool hashFocus;
 
   CalcItem({
     this.expression = "",
-    this.value = "",
+    this.value = 0,
     this.description = "",
     this.hashFocus = false,
   });
 
   bool isEmpty() {
-    return expression.isEmpty && value.isEmpty && description.isEmpty;
+    return value < _ERROR || value == double.infinity;
   }
 }
