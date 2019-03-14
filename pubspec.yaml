@@ -23,7 +23,7 @@ dependencies:
   sqflite: ^1.1.0
   tuple: ^1.0.2
   uuid: 2.0.0
-  fluttertoast: ^2.2.11
+  fluttertoast: ^3.0.3
   math_expressions: ^1.0.0
   shared_preferences: ^0.5.1+1
   flutter_local_notifications: ^0.5.2
