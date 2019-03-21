@@ -10,6 +10,7 @@ class Month {
   List<MonthMovement> incomes;
   List<MonthMovement> expenses;
   int accumulationPercentage;
+  bool isAvailable;
   String _name;
   String _shortName;
   List<Day> _days;
@@ -23,6 +24,7 @@ class Month {
     incomes = [];
     expenses = [];
     accumulationPercentage = 0;
+    isAvailable = false;
   }
 
   Month.withJson({String id, int yearNumber, int number, accumulationPercentage}) {
@@ -34,6 +36,7 @@ class Month {
     incomes = [];
     expenses = [];
     this.accumulationPercentage = accumulationPercentage;
+    isAvailable = false;
   }
 
   String get id => _id;

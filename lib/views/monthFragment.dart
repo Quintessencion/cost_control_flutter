@@ -4,6 +4,8 @@ import 'package:cost_control/views/dayView.dart';
 import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/baseScreenState.dart';
+import 'package:cost_control/redux/actions/mainActions.dart';
+import 'package:cost_control/utils/purchasesManager.dart';
 
 class MonthFragment extends StatefulWidget {
   final Month month;
@@ -35,6 +37,10 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
 
   @override
   Widget build(BuildContext context) {
+    return widget.month.isAvailable ? _getView() : _getOfferPurchase();
+  }
+
+  Widget _getView() {
     return Container(
       color: Theme.of(context).primaryColor,
       constraints: BoxConstraints.expand(),
@@ -168,6 +174,56 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getOfferPurchase() {
+    return Container(
+      color: Theme.of(context).primaryColor,
+      constraints: BoxConstraints.expand(),
+      child: Column(
+        children: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(20),
+            child: Text(
+              "В бесплатной версии доступен только один месяц.",
+              style: TextStyle(
+                fontFamily: "SFPro",
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Container(
+              constraints: BoxConstraints.expand(height: 52),
+              child: RaisedButton(
+                child: Text(
+                  "Купить",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color.fromRGBO(91, 122, 229, 1),
+                  ),
+                ),
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16))),
+                onPressed: () async {
+                  try {
+                    PurchasesManager manager = await PurchasesManager.instance;
+                    manager.buyNextMonth();
+                  } catch (error) {
+                    int a = 0;
+                  }
+                },
               ),
             ),
           ),

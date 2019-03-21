@@ -7,6 +7,7 @@ import 'package:cost_control/redux/actions/mainActions.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/utils/sharedPref.dart';
 import 'package:cost_control/utils/timeUtils.dart';
+import 'package:cost_control/utils/purchasesManager.dart';
 import 'package:redux/redux.dart';
 import 'package:tuple/tuple.dart';
 
@@ -42,7 +43,7 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     addMonthMovements(dataBaseMonths, movements);
     addRealMonthData(months, dataBaseMonths);
 
-    computeMonths(months);
+    await computeMonths(months);
     next(new OnMonthsLoaded(
       months: months,
       currentPage: getCurrentPage(action, months),
@@ -112,7 +113,8 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     databaseMonths.sort((a, b) => a.compareTo(b));
     int i = 0;
     for (Month month in empty) {
-      while (i + 1 < databaseMonths.length && month.compareTo(databaseMonths[i + 1]) > 0) {
+      while (i + 1 < databaseMonths.length &&
+          month.compareTo(databaseMonths[i + 1]) > 0) {
         i++;
       }
       month.addVirtualData(databaseMonths[i]);
@@ -138,10 +140,38 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     }
   }
 
-  void computeMonths(List<Month> months) {
+  Future<bool> computeMonths(List<Month> months) async {
+    Month notEmptyMonth;
     for (Month month in months) {
       month.computeBalance();
+      if (isNotEmptyMonth(month)) {
+        notEmptyMonth = month;
+      }
     }
+    bool isPurchasedNextMonth;
+    try {
+      PurchasesManager manager = await PurchasesManager.instance;
+      isPurchasedNextMonth = await manager.isPurchasedNextMonth();
+    } catch (error) {
+      return Future.value(false);
+    }
+    if (isPurchasedNextMonth || notEmptyMonth == null) {
+      for (Month month in months) {
+        month.isAvailable = true;
+      }
+    } else {
+      notEmptyMonth.isAvailable = true;
+    }
+    return Future.value(true);
+  }
+
+  bool isNotEmptyMonth(Month month) {
+    for (Day day in month.days) {
+      if (day.expenses.isNotEmpty) {
+        return true;
+      }
+    }
+    return false;
   }
 
   int getCurrentPage(LoadMonths action, List<Month> months) {

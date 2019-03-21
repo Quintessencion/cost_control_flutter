@@ -47,7 +47,6 @@ class DBProvider {
           "name TEXT,"
           "sum REAL"
           ")");
-      await generateTestData(db);
     });
   }
 
