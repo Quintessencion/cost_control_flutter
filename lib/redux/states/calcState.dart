@@ -1,6 +1,8 @@
 import 'package:cost_control/entities/calcItem.dart';
+import 'package:cost_control/entities/expense.dart';
 
 class CalcState {
+  List<Expense> initExpenses;
   List<CalcItem> expenses;
   int currentPage;
 

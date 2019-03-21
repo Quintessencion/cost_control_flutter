@@ -4,6 +4,7 @@ import 'package:cost_control/database.dart';
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/entities/calcItem.dart';
 import 'package:cost_control/entities/expense.dart';
+import 'package:cost_control/utils/reminder.dart';
 import 'package:uuid/uuid.dart';
 
 class CalcMiddleware extends MiddlewareClass<AppState> {
@@ -27,9 +28,26 @@ class CalcMiddleware extends MiddlewareClass<AppState> {
         }
       }
       await DBProvider.db.updateDay(day);
+      if (_isChanged(store.state.calcState.initExpenses, day.expenses)) {
+        Reminder.setRemind();
+      }
       action.onComplete();
     } catch (e) {
       action.onError("Ошибка при сохранении данных");
     }
+  }
+
+  bool _isChanged(List<Expense> a, List<Expense> b) {
+    if (a.length != b.length) {
+      return true;
+    }
+    for (int i = 0; i < a.length; i++) {
+      Expense ea = a[i];
+      Expense eb = b[i];
+      if (ea.cost != eb.cost || ea.description != eb.description) {
+        return true;
+      }
+    }
+    return false;
   }
 }

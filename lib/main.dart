@@ -5,14 +5,10 @@ import 'package:redux/redux.dart';
 import 'package:cost_control/redux/store.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/screens/mainScreen.dart';
-import 'package:cost_control/utils/reminder.dart';
 
 final RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
 
-void main() {
-  Reminder.setRemind();
-  runApp(MyApp(prepareStore()));
-}
+void main() => runApp(MyApp(prepareStore()));
 
 class MyApp extends StatelessWidget {
   Store<AppState> store;

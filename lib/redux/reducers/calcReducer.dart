@@ -8,6 +8,7 @@ import 'package:cost_control/entities/calcItem.dart';
 
 final calcReducer = combineReducers<CalcState>([
   TypedReducer<CalcState, InitState>((state, action) {
+    state.initExpenses = action.day.expenses;
     state.expenses = action.day.expenses.map((e) {
       return CalcItem(
         expression: MoneyUtils.calc(e.cost),
