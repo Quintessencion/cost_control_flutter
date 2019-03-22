@@ -4,6 +4,7 @@ import 'package:cost_control/views/dayView.dart';
 import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/baseScreenState.dart';
+import 'package:auto_size_text/auto_size_text.dart';
 
 class MonthFragment extends StatefulWidget {
   final Month month;
@@ -179,34 +180,38 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
   Widget _getHeader() {
     List<Widget> elements = new List();
 
-    elements.add(Padding(
-      padding: EdgeInsets.only(left: 20),
-      child: Text(
-        MoneyUtils.standard(widget.month.balanceToCurrentDay),
-        style: TextStyle(
-          fontFamily: "SFPro",
-          fontSize: 78,
-          fontWeight: FontWeight.w300,
-          color: Colors.white,
-        ),
-      ),
-    ));
-
-    elements.add(Text(
-      " ₽",
-      style: TextStyle(
-        fontFamily: "SFPro",
-        fontSize: 78,
-        fontWeight: FontWeight.w100,
-        color: Colors.white,
-      ),
-    ));
+    elements.add(Flexible(
+        child: Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: AutoSizeText.rich(
+            TextSpan(children: <TextSpan>[
+              TextSpan(
+                text: MoneyUtils.standard(widget.month.balanceToCurrentDay),
+                style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 78,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w300),
+              ),
+              TextSpan(
+                text: " ₽",
+                style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 78,
+                    color: Colors.white,
+                    fontWeight: FontWeight.w100),
+              ),
+            ]),
+            maxLines: 1,
+            minFontSize: 1,
+          ),
+        )));
 
     if (widget.isCurrent) {
       int currentDayIndex = DateTime.now().day - 1;
       Day currentDay = widget.month.days[currentDayIndex];
       elements.add(Padding(
-        padding: EdgeInsets.only(left: 16, top: 16),
+        padding: EdgeInsets.all(16),
         child: Container(
           width: 40,
           height: 40,

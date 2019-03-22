@@ -37,7 +37,9 @@ class _CalcItemViewState extends State<CalcItemView> {
     if (widget.item.hashFocus) {
       FocusScope.of(context).requestFocus(_focusNode);
     }
+    TextSelection lastSelection = _controller.selection.copyWith();
     _controller.text = widget.item.description;
+    _controller.selection = lastSelection;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: <Widget>[

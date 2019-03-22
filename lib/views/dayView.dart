@@ -16,27 +16,22 @@ class DayView extends StatelessWidget {
       child: Container(
         margin: EdgeInsets.symmetric(horizontal: 16),
         height: HEIGHT,
-        child: Stack(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                _getDay(),
-                Container(
-                  constraints: BoxConstraints.expand(width: 0.5),
-                  color: Colors.grey,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 16, top: 16, bottom: 16),
-                    child: _getDescription(),
-                  ),
-                ),
-              ],
+            _getDay(),
+            Container(
+              constraints: BoxConstraints.expand(width: 0.5),
+              color: Colors.grey,
+            ),
+            Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(left: 16, top: 16, bottom: 16),
+                child: _getDescription(),
+              ),
             ),
             Container(
               padding: EdgeInsets.symmetric(vertical: 16),
-              alignment: Alignment.topRight,
               child: Stack(
                 alignment: Alignment.topRight,
                 children: _getRightPanel(),
@@ -103,27 +98,24 @@ class DayView extends StatelessWidget {
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
-            children: <Widget>[
-              Text(
-                day.expensesSum.round().toString(),
+          RichText(
+            overflow: TextOverflow.ellipsis,
+            text: TextSpan(
+                children: <TextSpan>[
+                  TextSpan(
+                    text: day.expensesSum.round().toString(),
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  TextSpan(
+                    text: " ₽",
+                    style: TextStyle(fontWeight: FontWeight.w300),
+                  ),
+                ],
                 style: TextStyle(
                   fontFamily: "SFPro",
                   fontSize: 16,
-                  fontWeight: FontWeight.bold,
                   color: Color.fromRGBO(61, 61, 61, 1),
-                ),
-              ),
-              Text(
-                " ₽",
-                style: TextStyle(
-                  fontFamily: "SFPro",
-                  fontSize: 16,
-                  fontWeight: FontWeight.w300,
-                  color: Color.fromRGBO(61, 61, 61, 1),
-                ),
-              )
-            ],
+                )),
           ),
           Expanded(child: Container()),
           Text(
@@ -141,6 +133,7 @@ class DayView extends StatelessWidget {
     } else {
       return Text(
         "Трат пока нет :)",
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           fontFamily: "SFPro",
           fontSize: 14,

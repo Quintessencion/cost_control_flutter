@@ -49,16 +49,18 @@ class IncomesFragment extends BaseMonthInfoFragment {
             padding: EdgeInsets.only(top: 16, bottom: 12, left: 20, right: 20),
             child: Row(
               children: <Widget>[
-                Text(
-                  "Всего",
-                  style: TextStyle(
-                    fontFamily: "SFPro",
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: Color.fromRGBO(61, 61, 61, 1),
+                Expanded(
+                  child: Text(
+                    "Всего",
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: "SFPro",
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: Color.fromRGBO(61, 61, 61, 1),
+                    ),
                   ),
                 ),
-                Expanded(child: Container()),
                 Text(
                   MoneyUtils.standard(_month.monthIncomesSum),
                   style: TextStyle(

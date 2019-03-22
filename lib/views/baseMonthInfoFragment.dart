@@ -17,16 +17,18 @@ abstract class BaseMonthInfoFragment extends StatelessWidget {
       padding: EdgeInsets.only(top: 16, bottom: 12, left: 20, right: 12),
       child: Row(
         children: <Widget>[
-          Text(
-            header,
-            style: TextStyle(
-              fontFamily: "SFPro",
-              fontSize: 14,
-              fontWeight: FontWeight.w300,
-              color: Color.fromRGBO(101, 101, 101, 1),
+          Expanded(
+            child: Text(
+              header,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: "SFPro",
+                fontSize: 14,
+                fontWeight: FontWeight.w300,
+                color: Color.fromRGBO(101, 101, 101, 1),
+              ),
             ),
           ),
-          Expanded(child: Container()),
           Text(
             MoneyUtils.standard(value),
             style: TextStyle(
