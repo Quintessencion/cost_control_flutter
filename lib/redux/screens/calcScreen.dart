@@ -63,10 +63,7 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
         onClose = () {
           store.dispatch(SaveDay(
             day: widget.day,
-            onComplete: () {
-              store.dispatch(new LoadMonths(
-                  currentPage: store.state.mainState.currentPage));
-            },
+            onComplete: () => store.dispatch(LoadMonths()),
             onError: showToast,
           ));
         };
@@ -276,7 +273,10 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
             color: Color.fromRGBO(176, 193, 251, 1),
           ),
         ),
-        onTap: vm.onDeleteSymbol,
+        onTap: () {
+          vm.onDismiss();
+          vm.onDeleteSymbol();
+        },
       ),
       _getMathButton(vm, "+"),
     ];
@@ -316,7 +316,10 @@ class _CalcScreenState extends BaseScreenState<CalcScreen>
         color: Theme.of(context).primaryColor,
         child: icon,
       ),
-      onTap: () => vm.onAddSymbol(symbol),
+      onTap: () {
+        vm.onDismiss();
+        vm.onAddSymbol(symbol);
+      },
     );
   }
 }

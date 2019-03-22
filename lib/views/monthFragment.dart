@@ -12,8 +12,16 @@ class MonthFragment extends StatefulWidget {
   final Month month;
   final bool isCurrent;
   final Function(Day day) onDayClick;
+  final Function() purchaseNextMonth;
+  final Function() restorePurchases;
 
-  MonthFragment({this.month, this.isCurrent, this.onDayClick});
+  MonthFragment({
+    this.month,
+    this.isCurrent,
+    this.onDayClick,
+    this.purchaseNextMonth,
+    this.restorePurchases,
+  });
 
   @override
   _MonthFragmentState createState() => _MonthFragmentState();
@@ -217,14 +225,28 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
                 color: Colors.white,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.all(Radius.circular(16))),
-                onPressed: () async {
-                  try {
-                    PurchasesManager manager = await PurchasesManager.instance;
-                    manager.buyNextMonth();
-                  } catch (error) {
-                    int a = 0;
-                  }
-                },
+                onPressed: widget.purchaseNextMonth,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(left: 20, top: 20, right: 20),
+            child: Container(
+              constraints: BoxConstraints.expand(height: 52),
+              child: RaisedButton(
+                child: Text(
+                  "Восстановить покупку",
+                  style: TextStyle(
+                    fontFamily: "SFPro",
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color.fromRGBO(91, 122, 229, 1),
+                  ),
+                ),
+                color: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(16))),
+                onPressed: widget.restorePurchases,
               ),
             ),
           ),
@@ -238,30 +260,30 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
 
     elements.add(Flexible(
         child: Padding(
-          padding: EdgeInsets.only(left: 20),
-          child: AutoSizeText.rich(
-            TextSpan(children: <TextSpan>[
-              TextSpan(
-                text: MoneyUtils.standard(widget.month.balanceToCurrentDay),
-                style: TextStyle(
-                    fontFamily: "SFPro",
-                    fontSize: 78,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w300),
-              ),
-              TextSpan(
-                text: " ₽",
-                style: TextStyle(
-                    fontFamily: "SFPro",
-                    fontSize: 78,
-                    color: Colors.white,
-                    fontWeight: FontWeight.w100),
-              ),
-            ]),
-            maxLines: 1,
-            minFontSize: 1,
+      padding: EdgeInsets.only(left: 20),
+      child: AutoSizeText.rich(
+        TextSpan(children: <TextSpan>[
+          TextSpan(
+            text: MoneyUtils.standard(widget.month.balanceToCurrentDay),
+            style: TextStyle(
+                fontFamily: "SFPro",
+                fontSize: 78,
+                color: Colors.white,
+                fontWeight: FontWeight.w300),
           ),
-        )));
+          TextSpan(
+            text: " ₽",
+            style: TextStyle(
+                fontFamily: "SFPro",
+                fontSize: 78,
+                color: Colors.white,
+                fontWeight: FontWeight.w100),
+          ),
+        ]),
+        maxLines: 1,
+        minFontSize: 1,
+      ),
+    )));
 
     if (widget.isCurrent) {
       int currentDayIndex = DateTime.now().day - 1;

@@ -1,16 +1,11 @@
 import 'package:cost_control/entities/month.dart';
 
-class LoadMonths {
-  final int currentPage;
-
-  LoadMonths({this.currentPage = -1});
-}
+class LoadMonths {}
 
 class OnMonthsLoaded {
   final List<Month> months;
-  final int currentPage;
 
-  OnMonthsLoaded({this.months, this.currentPage});
+  OnMonthsLoaded({this.months});
 }
 
 class SetCurrentPage {
@@ -24,3 +19,16 @@ class SetFirstScreenVisibility {
 
   SetFirstScreenVisibility({this.visibility});
 }
+
+class PurchaseNextMonth {
+  final void Function(String) onResult;
+
+  PurchaseNextMonth({this.onResult});
+}
+
+class RestorePurchase {
+  final void Function(String) onResult;
+
+  RestorePurchase({this.onResult});
+}
+

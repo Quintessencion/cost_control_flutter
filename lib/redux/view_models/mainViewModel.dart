@@ -7,6 +7,8 @@ class MainViewModel {
   final void Function(Day day) onOpenCalcScreen;
   final void Function(int index) onPageChange;
   final void Function() onFirstSession;
+  final void Function() onPurchaseNextMonth;
+  final void Function() onRestorePurchase;
 
   MainViewModel({
     this.state,
@@ -14,5 +16,7 @@ class MainViewModel {
     this.onOpenCalcScreen,
     this.onPageChange,
     this.onFirstSession,
+    this.onPurchaseNextMonth,
+    this.onRestorePurchase,
   });
 }

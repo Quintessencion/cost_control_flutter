@@ -82,6 +82,7 @@ class ExpensesFragment extends BaseMonthInfoFragment {
                         child: TextField(
                           focusNode: _focus,
                           controller: _controller,
+                          keyboardType: TextInputType.number,
                           inputFormatters: [
                             WhitelistingTextInputFormatter.digitsOnly,
                           ],

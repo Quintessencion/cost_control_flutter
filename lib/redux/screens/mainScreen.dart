@@ -46,6 +46,10 @@ class _MainScreenState extends BaseScreenState<MainScreen>
             store.dispatch(SetFirstScreenVisibility(visibility: false));
             _openInfoScreen(store);
           },
+          onPurchaseNextMonth: () =>
+              store.dispatch(PurchaseNextMonth(onResult: showToast)),
+          onRestorePurchase: () =>
+              store.dispatch(RestorePurchase(onResult: showToast)),
         );
       },
       builder: (BuildContext context, MainViewModel vm) {
@@ -214,6 +218,8 @@ class _MainScreenState extends BaseScreenState<MainScreen>
         month: vm.state.months[i],
         isCurrent: vm.state.months[i].isBelong(DateTime.now()),
         onDayClick: vm.onOpenCalcScreen,
+        purchaseNextMonth: vm.onPurchaseNextMonth,
+        restorePurchases: vm.onRestorePurchase,
       ));
     }
     return TabBarView(
@@ -295,6 +301,6 @@ class _MainScreenState extends BaseScreenState<MainScreen>
     await openScreen(new MonthInfoScreen(
       month: state.months[state.currentPage],
     ));
-    store.dispatch(new LoadMonths(currentPage: state.currentPage));
+    store.dispatch(LoadMonths());
   }
 }

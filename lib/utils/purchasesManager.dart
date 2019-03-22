@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:cost_control/utils/sharedPref.dart';
 import 'package:flutter_inapp_purchase/flutter_inapp_purchase.dart';
 
 class PurchasesManager {
@@ -24,18 +25,28 @@ class PurchasesManager {
   }
 
   Future<bool> isPurchasedNextMonth() async {
+    return SharedPref.internal().isPurchasedNextMonth();
+  }
+
+  Future<bool> restorePurchases() async {
     List<PurchasedItem> purchases = await FlutterInappPurchase.getAvailablePurchases();
     List<IAPItem> items = await FlutterInappPurchase.getProducts([NEXT_MONTH]);
     for (PurchasedItem item in purchases) {
       if (item.productId == NEXT_MONTH) {
-        return true;
+        await SharedPref.internal().purchasedNextMonth();
       }
     }
-    return false;
+    return true;
   }
 
   Future<bool> buyNextMonth() async {
+    List<IAPItem> items = await FlutterInappPurchase.getProducts([NEXT_MONTH]);
     PurchasedItem res = await FlutterInappPurchase.buyProduct(NEXT_MONTH);
-    return res.productId == NEXT_MONTH;
+    if (res.productId == NEXT_MONTH) {
+      await SharedPref.internal().purchasedNextMonth();
+      return true;
+    } else {
+      return false;
+    }
   }
 }

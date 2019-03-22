@@ -18,6 +18,10 @@ class MainMiddleware extends MiddlewareClass<AppState> {
       loadMonths(action, next);
     } else if (action is SetFirstScreenVisibility) {
       hideFirstScreen(next);
+    } else if (action is PurchaseNextMonth) {
+      purchaseNextMonth(action, next);
+    }  else if (action is RestorePurchase) {
+      restorePurchase(action, next);
     } else {
       next(action);
     }
@@ -46,7 +50,6 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     await computeMonths(months);
     next(new OnMonthsLoaded(
       months: months,
-      currentPage: getCurrentPage(action, months),
     ));
   }
 
@@ -80,6 +83,53 @@ class MainMiddleware extends MiddlewareClass<AppState> {
       beginDate = DateTime(beginDate.year, beginDate.month + 1, beginDate.day);
     }
     return months;
+  }
+
+  void purchaseNextMonth(PurchaseNextMonth action, NextDispatcher next) async {
+    PurchasesManager manager;
+    try {
+      manager = await PurchasesManager.instance;
+    } catch (e) {
+      action.onResult("Магазин недоступен");
+    }
+    if (manager == null) {
+      return;
+    }
+    try {
+      bool res = await manager.buyNextMonth();
+      if (res) {
+        action.onResult("Приобретено!");
+        loadMonths(LoadMonths(), next);
+      } else {
+        throw Error();
+      }
+    } catch (e) {
+      action.onResult("При покупке произошла ошибка");
+    }
+  }
+
+  void restorePurchase(RestorePurchase action, NextDispatcher next) async {
+    PurchasesManager manager;
+    try {
+      manager = await PurchasesManager.instance;
+    } catch (e) {
+      action.onResult("Магазин недоступен");
+    }
+    if (manager == null) {
+      return;
+    }
+    try {
+      await manager.restorePurchases();
+      bool res = await manager.isPurchasedNextMonth();
+      if (res) {
+        action.onResult("Покупка восстановлена");
+        loadMonths(LoadMonths(), next);
+      } else {
+        action.onResult("У вас нет данной покупки");
+      }
+    } catch (e) {
+      action.onResult("Восстановление не удалось");
+    }
   }
 
   void addExpensesToDays(List<Month> months, List<Expense> expenses) {
@@ -141,10 +191,11 @@ class MainMiddleware extends MiddlewareClass<AppState> {
   }
 
   Future<bool> computeMonths(List<Month> months) async {
+    Month firstEdited = await SharedPref.internal().getFirstEditMonth();
     Month notEmptyMonth;
     for (Month month in months) {
       month.computeBalance();
-      if (isNotEmptyMonth(month)) {
+      if (firstEdited != null && month.compareTo(firstEdited) == 0) {
         notEmptyMonth = month;
       }
     }
@@ -163,26 +214,5 @@ class MainMiddleware extends MiddlewareClass<AppState> {
       notEmptyMonth.isAvailable = true;
     }
     return Future.value(true);
-  }
-
-  bool isNotEmptyMonth(Month month) {
-    for (Day day in month.days) {
-      if (day.expenses.isNotEmpty) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  int getCurrentPage(LoadMonths action, List<Month> months) {
-    if (action.currentPage >= 0) {
-      return action.currentPage;
-    }
-    for (int i = 0; i < months.length; i++) {
-      if (months[i].isBelong(DateTime.now())) {
-        return i;
-      }
-    }
-    return 0;
   }
 }

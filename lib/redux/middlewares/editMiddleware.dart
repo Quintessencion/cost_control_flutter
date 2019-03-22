@@ -4,6 +4,7 @@ import 'package:cost_control/database.dart';
 import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/monthMovement.dart';
 import 'package:cost_control/redux/actions/editActions.dart';
+import 'package:cost_control/utils/sharedPref.dart';
 import 'package:uuid/uuid.dart';
 
 class EditMiddleware extends MiddlewareClass<AppState> {
@@ -39,6 +40,7 @@ class EditMiddleware extends MiddlewareClass<AppState> {
     Month month = await DBProvider.db.getMonth(action.month.id);
     if (month == null) {
       await DBProvider.db.addMonth(action.month);
+      await SharedPref.internal().tryUpdateFirstEditMonth(action.month);
     }
     MonthMovement movement = new MonthMovement(
       id: Uuid().v1(),

@@ -4,6 +4,7 @@ import 'package:cost_control/database.dart';
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/entities/calcItem.dart';
 import 'package:cost_control/entities/expense.dart';
+import 'package:cost_control/utils/sharedPref.dart';
 import 'package:cost_control/utils/reminder.dart';
 import 'package:uuid/uuid.dart';
 
@@ -29,7 +30,8 @@ class CalcMiddleware extends MiddlewareClass<AppState> {
       }
       await DBProvider.db.updateDay(day);
       if (_isChanged(store.state.calcState.initExpenses, day.expenses)) {
-        Reminder.setRemind();
+        await SharedPref.internal().tryUpdateFirstEditMonth(day.parent);
+        Reminder.cancelCurrentDayRemind();
       }
       action.onComplete();
     } catch (e) {

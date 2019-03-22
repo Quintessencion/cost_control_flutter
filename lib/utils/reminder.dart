@@ -1,4 +1,5 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:cost_control/utils/sharedPref.dart';
 
 class Reminder {
   static FlutterLocalNotificationsPlugin _init() {
@@ -18,18 +19,27 @@ class Reminder {
     DateTime now = DateTime.now();
     DateTime time = DateTime(now.year, now.month, now.day, 18);
     time = time.add(new Duration(days: days));
-    plugin.schedule(
-      days,
-      'Напоминание',
-      'Не забыли заполнить свое расходы?',
-      time,
-      platformChannelSpecifics,
-    );
+    SharedPref.internal().isEditedDay(time.day).then((edited) {
+      if (!edited) {
+        plugin.schedule(
+          time.day,
+          'Напоминание',
+          'Не забыли заполнить свои расходы?',
+          time,
+          platformChannelSpecifics,
+        );
+      }
+    });
+  }
+
+  static void cancelCurrentDayRemind() {
+    FlutterLocalNotificationsPlugin plugin = _init();
+    plugin.cancel(DateTime.now().day);
+    SharedPref.internal().setLastEditedDay(DateTime.now().day);
   }
 
   static void setRemind() {
     FlutterLocalNotificationsPlugin plugin = _init();
-    plugin.cancelAll();
 
     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
         '659',
@@ -39,8 +49,8 @@ class Reminder {
     NotificationDetails platformChannelSpecifics = new NotificationDetails(
         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
 
+    _setupNotification(plugin, platformChannelSpecifics, 0);
     _setupNotification(plugin, platformChannelSpecifics, 1);
     _setupNotification(plugin, platformChannelSpecifics, 2);
-    _setupNotification(plugin, platformChannelSpecifics, 3);
   }
 }
