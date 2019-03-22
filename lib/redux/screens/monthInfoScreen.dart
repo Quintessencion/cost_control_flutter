@@ -200,16 +200,18 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
       padding: EdgeInsets.only(top: 20, bottom: 16, left: 20, right: 20),
       child: Row(
         children: <Widget>[
-          Text(
-            header,
-            style: TextStyle(
-              fontFamily: "SFPro",
-              fontSize: 16,
-              fontWeight: FontWeight.w300,
-              color: Colors.white,
+          Expanded(
+            child: Text(
+              header,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontFamily: "SFPro",
+                fontSize: 16,
+                fontWeight: FontWeight.w300,
+                color: Colors.white,
+              ),
             ),
           ),
-          Expanded(child: Container()),
           Text(
             MoneyUtils.standard(value),
             style: TextStyle(
