@@ -1,0 +1,99 @@
+{
+  "project_info": {
+    "project_number": "414401181345",
+    "firebase_url": "https://flutter-hello-firebase.firebaseio.com",
+    "project_id": "flutter-hello-firebase",
+    "storage_bucket": "flutter-hello-firebase.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414401181345:android:104c71055da3d392",
+        "android_client_info": {
+          "package_name": "com.quintessencion.flutter.hello.flutter_hello_world"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414401181345-9vrdo7nju6nkic26bo1ajgd8635ni679.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.quintessencion.flutter.hello.flutter_hello_world",
+            "certificate_hash": "2802dc697816e17f7e90a345625dff04cb9c9201"
+          }
+        },
+        {
+          "client_id": "414401181345-3jbmaofdmu832ua0u8pr1r9nubfb93sp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHcdFl-z61sMZd86e0ZfHZr2Lsy63Dgww"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414401181345-3jbmaofdmu832ua0u8pr1r9nubfb93sp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:414401181345:android:5fc654ed3a581ec5",
+        "android_client_info": {
+          "package_name": "com.simbirsoft.costcontrol"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "414401181345-3mrnhmj7v0i7ucvpq11m9hfjkrktn1ip.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.simbirsoft.costcontrol",
+            "certificate_hash": "2802dc697816e17f7e90a345625dff04cb9c9201"
+          }
+        },
+        {
+          "client_id": "414401181345-3jbmaofdmu832ua0u8pr1r9nubfb93sp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHcdFl-z61sMZd86e0ZfHZr2Lsy63Dgww"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "414401181345-3jbmaofdmu832ua0u8pr1r9nubfb93sp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -28,7 +28,8 @@ class Day {
 
   String get description {
     StringBuffer res = new StringBuffer();
-    List<Expense> withDescription = expenses.where((e) => e.description.isNotEmpty).toList();
+    List<Expense> withDescription =
+        expenses.where((e) => e.description.isNotEmpty).toList();
 
     for (int i = 0; i < withDescription.length; i++) {
       String description = withDescription[i].description.toLowerCase();
@@ -43,5 +44,20 @@ class Day {
       }
     }
     return res.toString();
+  }
+
+  toMap() {
+    var expenses = Map<String, Map<String, dynamic>>();
+    for (int i = 0; i < _expenses.length; i++) {
+      expenses['$i'] = _expenses[i].toJson();
+    }
+
+    return <String, dynamic>{
+      "month": _parent.toJson(),
+      "number": _number,
+      "expenses": expenses,
+      "budget": budget,
+      "balance": balance,
+    };
   }
 }

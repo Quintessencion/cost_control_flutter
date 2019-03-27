@@ -1,3 +1,4 @@
+import 'package:cost_control/redux/middlewares/remoteDatabaseMiddleware.dart';
 import 'package:redux/redux.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/redux/actions/mainActions.dart';
@@ -27,6 +28,7 @@ AppState _getReducers(AppState state, dynamic action) {
 
 List<Middleware<AppState>> _getMiddlewares() {
   return [
+    RemoteDatabaseMiddleware(),
     MainMiddleware(),
     MonthInfoMiddleware(),
     EditMiddleware(),

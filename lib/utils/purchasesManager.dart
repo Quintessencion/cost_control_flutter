@@ -17,9 +17,10 @@ class PurchasesManager {
 
   static Future<PurchasesManager> _init() async {
     String res = await FlutterInappPurchase.initConnection;
-    if (res == "true") {
+    if (res == "Billing client ready") {
       return PurchasesManager._();
     } else {
+      FlutterInappPurchase.endConnection;
       return Future.error(res);
     }
   }
