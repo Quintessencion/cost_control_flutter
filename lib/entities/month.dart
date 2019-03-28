@@ -1,7 +1,7 @@
-import 'package:uuid/uuid.dart';
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/entities/monthMovement.dart';
 import 'package:cost_control/utils/timeUtils.dart';
+import 'package:uuid/uuid.dart';
 
 class Month {
   String _id;
@@ -27,7 +27,8 @@ class Month {
     isAvailable = false;
   }
 
-  Month.withJson({String id, int yearNumber, int number, accumulationPercentage}) {
+  Month.withJson(
+      {String id, int yearNumber, int number, accumulationPercentage}) {
     _id = id;
     _yearNumber = yearNumber;
     _number = number;
@@ -37,6 +38,28 @@ class Month {
     expenses = [];
     this.accumulationPercentage = accumulationPercentage;
     isAvailable = false;
+  }
+
+  Month.withMap({
+    id,
+    yearNumber,
+    number,
+    accumulationPercentage,
+    isAvailable,
+    days,
+    generalBalance,
+  }) {
+    _id = id;
+    _yearNumber = yearNumber;
+    _number = number;
+    _name = TimeUtils.getMonthNameByNumber(number);
+    _shortName = TimeUtils.getMonthShortNameByNumber(number);
+    incomes = [];
+    expenses = [];
+    this.accumulationPercentage = accumulationPercentage;
+    this.isAvailable = isAvailable;
+    _days = days;
+    _generalBalance = generalBalance;
   }
 
   String get id => _id;
@@ -105,7 +128,8 @@ class Month {
   }
 
   double get dayBudget {
-    return budget / TimeUtils.getDaysCountByDate(new DateTime(_yearNumber, _number));
+    return budget /
+        TimeUtils.getDaysCountByDate(new DateTime(_yearNumber, _number));
   }
 
   double get monthAccumulation {
@@ -151,4 +175,37 @@ class Month {
         "number": number,
         "accumulationPercentage": accumulationPercentage,
       };
+
+  static Map<String, dynamic> listToMap(List<Month> months) {
+    Map<String, dynamic> monthsMap = Map();
+
+    for (Month month in months) {
+      monthsMap["${month.name}-${month.yearNumber}"] = month.toMap();
+    }
+
+    return monthsMap;
+  }
+
+  Map<String, dynamic> toMap() => {
+        "id": id,
+        "yearNumber": yearNumber,
+        "number": number,
+        "accumulationPercentage": accumulationPercentage,
+        "isAvailable": isAvailable,
+        "days": Day.listToMap(days),
+        "generalBalance": generalBalance,
+      };
+
+  factory Month.fromMap(Map<dynamic, dynamic> map) {
+    Month month = Month.withMap(
+      id: map["id"],
+      yearNumber: map["yearNumber"],
+      number: map["number"],
+      accumulationPercentage: map["accumulationPercentage"],
+      isAvailable: map["isAvailable"],
+      days: Day.fromMap(map["days"]),
+      generalBalance: map["generalBalance"].toDouble(),
+    );
+    return month;
+  }
 }

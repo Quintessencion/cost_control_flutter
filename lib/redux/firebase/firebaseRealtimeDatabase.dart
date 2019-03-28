@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:cost_control/entities/day.dart';
+import 'package:cost_control/entities/month.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class FirebaseRealtimeDatabase {
@@ -15,6 +16,8 @@ class FirebaseRealtimeDatabase {
 
   //main table name
   static const String USERS = "users";
+
+  //sub table name
   static const String MONTHS = "months";
 
   //sub table name
@@ -31,11 +34,13 @@ class FirebaseRealtimeDatabase {
   Future<Query> queryExpense() async {
     String accountKey = await _getAccountKey();
 
-    return reference
-        .child(USERS)
-        .child(accountKey)
-        .child(DAY)
-        .orderByChild(TIME_CREATION);
+    return reference.child(USERS).child(accountKey).child(MONTHS);
+  }
+
+  void saveMonths(Map<String, dynamic> months) async {
+    String accountKey = await _getAccountKey();
+
+    reference.child(USERS).child(accountKey).child(MONTHS).update(months);
   }
 
   Future<void> saveDay(Day day) async {
@@ -45,58 +50,33 @@ class FirebaseRealtimeDatabase {
         .child(USERS)
         .child(accountKey)
         .child(MONTHS)
-        .child(day.parent.name)
+        .child("${day.parent.name}-${day.parent.yearNumber}")
         .child('${day.number}')
         .update(day.toMap());
-  }
-
-  Future<void> saveSum(String snapshotKey, String sum) async {
-    String accountKey = await _getAccountKey();
-
-    return reference
-        .child(USERS)
-        .child(accountKey)
-        .child(DAY)
-        .child(snapshotKey)
-        .child(SUM)
-        .set(sum);
-  }
-
-  Future<Query> removeCostRecord(String snapshotKey) async {
-    String accountKey = await _getAccountKey();
-
-    reference
-        .child(USERS)
-        .child(accountKey)
-        .child(DAY)
-        .child(snapshotKey)
-        .remove();
-
-    return queryExpense();
   }
 
   Future<Query> removeAll() async {
     String accountKey = await _getAccountKey();
 
-    reference.child(USERS).child(accountKey).child(DAY).remove();
+    reference.child(USERS).child(accountKey).remove();
 
     return queryExpense();
   }
 
-  Future<StreamSubscription<Event>> getSumStream(
-      String snapshotKey, void onData(String name)) async {
+  Future<StreamSubscription<Event>> getMonthStream(
+      Month month, void onData(Month month)) async {
     String accountKey = await _getAccountKey();
 
     StreamSubscription<Event> subscription = reference
         .child(USERS)
         .child(accountKey)
-        .child(DAY)
-        .child(snapshotKey)
-        .child(SUM)
+        .child(MONTHS)
+        .child("${month.name}-${month.yearNumber}")
         .onValue
         .listen((Event event) {
-      String sum = event.snapshot.value as String;
-      onData(sum == null ? "" : sum);
+      Map<dynamic, dynamic> value = event.snapshot.value;
+      onData(Month.fromMap(value));
+      print("");
     });
 
     return subscription;

@@ -1,15 +1,16 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:cost_control/baseScreenState.dart';
+import 'package:cost_control/entities/day.dart';
+import 'package:cost_control/entities/month.dart';
+import 'package:cost_control/redux/firebase/firebaseRealtimeDatabase.dart';
 import 'package:cost_control/utils/moneyUtils.dart';
 import 'package:cost_control/views/dayView.dart';
-import 'package:cost_control/entities/month.dart';
-import 'package:cost_control/entities/day.dart';
-import 'package:cost_control/baseScreenState.dart';
-import 'package:auto_size_text/auto_size_text.dart';
-import 'package:cost_control/redux/actions/mainActions.dart';
-import 'package:cost_control/utils/purchasesManager.dart';
+import 'package:flutter/material.dart';
 
 class MonthFragment extends StatefulWidget {
-  final Month month;
+  Month month;
   final bool isCurrent;
   final Function(Day day) onDayClick;
   final Function() purchaseNextMonth;
@@ -30,8 +31,14 @@ class MonthFragment extends StatefulWidget {
 class _MonthFragmentState extends BaseScreenState<MonthFragment> {
   ScrollController _scrollController;
 
+  StreamSubscription _monthSubscription;
+
   @override
   void initState() {
+    FirebaseRealtimeDatabase.instance
+        .getMonthStream(widget.month, _onMonthsLoad)
+        .then((StreamSubscription s) => _monthSubscription = s);
+
     DateTime now = DateTime.now();
     if (now.year == widget.month.yearNumber &&
         now.month == widget.month.number) {
@@ -42,6 +49,18 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
       _scrollController = new ScrollController();
     }
     super.initState();
+  }
+
+  void _onMonthsLoad(Month month) {
+//    setState(() => widget.month = month);
+  }
+
+  @override
+  void dispose() {
+    if (_monthSubscription != null) {
+      _monthSubscription.cancel();
+    }
+    super.dispose();
   }
 
   @override

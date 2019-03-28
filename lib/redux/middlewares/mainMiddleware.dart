@@ -4,6 +4,7 @@ import 'package:cost_control/entities/expense.dart';
 import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/monthMovement.dart';
 import 'package:cost_control/redux/actions/mainActions.dart';
+import 'package:cost_control/redux/firebase/firebaseRealtimeDatabase.dart';
 import 'package:cost_control/redux/states/appState.dart';
 import 'package:cost_control/utils/sharedPref.dart';
 import 'package:cost_control/utils/timeUtils.dart';
@@ -48,6 +49,9 @@ class MainMiddleware extends MiddlewareClass<AppState> {
     addRealMonthData(months, dataBaseMonths);
 
     await computeMonths(months);
+
+    FirebaseRealtimeDatabase.instance.saveMonths(Month.listToMap(months));
+
     next(new OnMonthsLoaded(
       months: months,
     ));

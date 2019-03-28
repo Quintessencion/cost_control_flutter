@@ -12,6 +12,9 @@ class Day {
     _expenses = new List();
   }
 
+  Day.withMap(
+      this._parent, this._number, this._expenses, this.budget, this.balance);
+
   Month get parent => _parent;
 
   int get number => _number;
@@ -46,18 +49,42 @@ class Day {
     return res.toString();
   }
 
-  toMap() {
+  static Map<String, dynamic> listToMap(List<Day> days) {
+    Map<String, dynamic> daysMap = Map();
+
+    for (Day day in days) {
+      daysMap["${day.number}"] = day.toMap();
+    }
+
+    return daysMap;
+  }
+
+  Map<String, dynamic> toMap() {
     var expenses = Map<String, Map<String, dynamic>>();
     for (int i = 0; i < _expenses.length; i++) {
       expenses['$i'] = _expenses[i].toJson();
     }
 
     return <String, dynamic>{
-      "month": _parent.toJson(),
       "number": _number,
       "expenses": expenses,
       "budget": budget,
       "balance": balance,
     };
+  }
+
+  static List<Day> fromMap(List<dynamic> days) {
+    var list = List.from(days);
+    list.removeWhere((value) => value == null);
+    return list.map((value) {
+      Map<dynamic, dynamic> daysMap = value;
+      return Day.withMap(
+        daysMap["parent"],
+        daysMap["number"],
+        Expense.fromList(daysMap["expenses"]),
+        daysMap["budget"].toDouble(),
+        daysMap["balance"].toDouble(),
+      );
+    }).toList();
   }
 }

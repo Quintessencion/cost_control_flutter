@@ -32,4 +32,26 @@ class Expense {
         "description": description,
         "cost": cost,
       };
+
+  static List<Expense> fromList(List<dynamic> expenses) {
+    if (expenses == null) {
+      return List<Expense>();
+    }
+
+    var list = List.from(expenses);
+    list.removeWhere((value) => value == null);
+    return list.map((value) {
+      Map<dynamic, dynamic> expensesMap = value;
+      return Expense.fromMap(expensesMap);
+    }).toList();
+  }
+
+  factory Expense.fromMap(Map<dynamic, dynamic> json) => new Expense(
+        id: json["id"],
+        year: json["year"],
+        month: json["month"],
+        day: json["day"],
+        description: json["description"],
+        cost: json["cost"].toDouble(),
+      );
 }
