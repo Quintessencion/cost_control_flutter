@@ -46,12 +46,12 @@ class Expense {
     }).toList();
   }
 
-  factory Expense.fromMap(Map<dynamic, dynamic> json) => new Expense(
-        id: json["id"],
-        year: json["year"],
-        month: json["month"],
-        day: json["day"],
-        description: json["description"],
-        cost: json["cost"].toDouble(),
+  factory Expense.fromMap(Map<dynamic, dynamic> map) => new Expense(
+        id: map["id"],
+        year: map["year"],
+        month: map["month"],
+        day: map["day"],
+        description: map["description"],
+        cost: map["cost"].toDouble(),
       );
 }

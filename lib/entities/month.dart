@@ -46,7 +46,6 @@ class Month {
     number,
     accumulationPercentage,
     isAvailable,
-    days,
     generalBalance,
   }) {
     _id = id;
@@ -58,7 +57,6 @@ class Month {
     expenses = [];
     this.accumulationPercentage = accumulationPercentage;
     this.isAvailable = isAvailable;
-    _days = days;
     _generalBalance = generalBalance;
   }
 
@@ -203,9 +201,11 @@ class Month {
       number: map["number"],
       accumulationPercentage: map["accumulationPercentage"],
       isAvailable: map["isAvailable"],
-      days: Day.fromMap(map["days"]),
       generalBalance: map["generalBalance"].toDouble(),
     );
+    month.setDays(Day.fromMap(map["days"], month));
     return month;
   }
+
+  setDays(List<Day> days) => _days = days;
 }

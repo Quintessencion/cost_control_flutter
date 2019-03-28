@@ -73,13 +73,13 @@ class Day {
     };
   }
 
-  static List<Day> fromMap(List<dynamic> days) {
+  static List<Day> fromMap(List<dynamic> days, Month month) {
     var list = List.from(days);
     list.removeWhere((value) => value == null);
     return list.map((value) {
       Map<dynamic, dynamic> daysMap = value;
       return Day.withMap(
-        daysMap["parent"],
+        Month(month.yearNumber, month.number),
         daysMap["number"],
         Expense.fromList(daysMap["expenses"]),
         daysMap["budget"].toDouble(),

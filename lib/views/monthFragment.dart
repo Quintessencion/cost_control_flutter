@@ -51,9 +51,7 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
     super.initState();
   }
 
-  void _onMonthsLoad(Month month) {
-//    setState(() => widget.month = month);
-  }
+  void _onMonthsLoad(Month month) => setState(() => widget.month = month);
 
   @override
   void dispose() {
