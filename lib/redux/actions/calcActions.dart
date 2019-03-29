@@ -42,4 +42,18 @@ class SaveDay {
   SaveDay({this.day, this.onComplete, this.onError});
 }
 
+class FirebaseSaveDay {
+  final Day day;
+
+  FirebaseSaveDay({this.day});
+}
+
+class SaveDays {
+  final List<Day> days;
+  final void Function() onComplete;
+  final void Function(String) onError;
+
+  SaveDays({this.days, this.onComplete, this.onError});
+}
+
 class ClearFocus {}

@@ -24,7 +24,7 @@ class Month {
     incomes = [];
     expenses = [];
     accumulationPercentage = 0;
-    isAvailable = false;
+    isAvailable = true;
   }
 
   Month.withJson(
@@ -37,7 +37,7 @@ class Month {
     incomes = [];
     expenses = [];
     this.accumulationPercentage = accumulationPercentage;
-    isAvailable = false;
+    isAvailable = true;
   }
 
   Month.withMap({

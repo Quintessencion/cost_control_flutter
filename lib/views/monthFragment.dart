@@ -15,6 +15,7 @@ class MonthFragment extends StatefulWidget {
   final Function(Day day) onDayClick;
   final Function() purchaseNextMonth;
   final Function() restorePurchases;
+  final Function(List<Day> days) onDayUpdate;
 
   MonthFragment({
     this.month,
@@ -22,6 +23,7 @@ class MonthFragment extends StatefulWidget {
     this.onDayClick,
     this.purchaseNextMonth,
     this.restorePurchases,
+    this.onDayUpdate,
   });
 
   @override
@@ -51,7 +53,13 @@ class _MonthFragmentState extends BaseScreenState<MonthFragment> {
     super.initState();
   }
 
-  void _onMonthsLoad(Month month) => setState(() => widget.month = month);
+  void _onMonthsLoad(Month month) => setState(() {
+        var differenceDays =
+            Day.getDifferenceDays(widget.month.days, month.days);
+        if (differenceDays.length > 0) {
+          widget.onDayUpdate(differenceDays);
+        }
+      });
 
   @override
   void dispose() {

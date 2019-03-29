@@ -54,4 +54,17 @@ class Expense {
         description: map["description"],
         cost: map["cost"].toDouble(),
       );
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+          other is Expense &&
+              runtimeType == other.runtimeType &&
+              description == other.description &&
+              cost == other.cost;
+
+  @override
+  int get hashCode =>
+      description.hashCode ^
+      cost.hashCode;
 }

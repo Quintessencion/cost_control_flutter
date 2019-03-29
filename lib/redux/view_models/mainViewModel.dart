@@ -9,6 +9,7 @@ class MainViewModel {
   final void Function() onFirstSession;
   final void Function() onPurchaseNextMonth;
   final void Function() onRestorePurchase;
+  final void Function(List<Day> days) onUpdateDay;
 
   MainViewModel({
     this.state,
@@ -18,5 +19,6 @@ class MainViewModel {
     this.onFirstSession,
     this.onPurchaseNextMonth,
     this.onRestorePurchase,
+    this.onUpdateDay,
   });
 }

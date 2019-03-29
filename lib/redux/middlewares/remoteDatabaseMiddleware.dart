@@ -6,7 +6,7 @@ import 'package:redux/redux.dart';
 class RemoteDatabaseMiddleware extends MiddlewareClass<AppState> {
   @override
   void call(Store store, action, NextDispatcher next) {
-    if (action is SaveDay) {
+    if (action is FirebaseSaveDay) {
       FirebaseRealtimeDatabase.instance.saveDay(action.day);
     }
     next(action);

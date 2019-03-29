@@ -1,3 +1,4 @@
+import 'package:collection/collection.dart';
 import 'package:cost_control/entities/expense.dart';
 import 'package:cost_control/entities/month.dart';
 
@@ -86,5 +87,18 @@ class Day {
         daysMap["balance"].toDouble(),
       );
     }).toList();
+  }
+
+  static List<Day> getDifferenceDays(List<Day> oldDays, List<Day> newDays) {
+    List<Day> updatedDays = List();
+
+    for (int i = 0; i < oldDays.length; i++) {
+      if (!ListEquality().equals(oldDays[i].expenses, newDays[i].expenses)) {
+        newDays[i]._parent = oldDays[i].parent;
+        updatedDays.add(newDays[i]);
+      }
+    }
+
+    return updatedDays;
   }
 }

@@ -21,6 +21,9 @@ class FirebaseRealtimeDatabase {
   static const String MONTHS = "months";
 
   //sub table name
+  static const String DAYS = "days";
+
+  //sub table name
   static const String DAY = "day";
 
   //fields name
@@ -51,6 +54,7 @@ class FirebaseRealtimeDatabase {
         .child(accountKey)
         .child(MONTHS)
         .child("${day.parent.name}-${day.parent.yearNumber}")
+        .child(DAYS)
         .child('${day.number}')
         .update(day.toMap());
   }

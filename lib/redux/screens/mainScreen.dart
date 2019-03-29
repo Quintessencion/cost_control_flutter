@@ -2,6 +2,7 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:cost_control/baseScreenState.dart';
 import 'package:cost_control/entities/day.dart';
+import 'package:cost_control/redux/actions/calcActions.dart';
 import 'package:cost_control/redux/actions/mainActions.dart';
 import 'package:cost_control/redux/screens/calcScreen.dart';
 import 'package:cost_control/redux/screens/monthInfoScreen.dart';
@@ -36,20 +37,25 @@ class _MainScreenState extends BaseScreenState<MainScreen>
       },
       converter: (store) {
         return MainViewModel(
-          state: store.state.mainState,
-          onOpenInfoScreen: () => _openInfoScreen(store),
-          onOpenCalcScreen: (day) => _openCalcScreen(store, day),
-          onPageChange: (index) {
-            store.dispatch(new SetCurrentPage(currentPage: index));
-          },
-          onFirstSession: () {
-            store.dispatch(SetFirstScreenVisibility(visibility: false));
-            _openInfoScreen(store);
-          },
-          onPurchaseNextMonth: () =>
-              store.dispatch(PurchaseNextMonth(onResult: showToast)),
-          onRestorePurchase: () =>
-              store.dispatch(RestorePurchase(onResult: showToast)),
+            state: store.state.mainState,
+            onOpenInfoScreen: () => _openInfoScreen(store),
+            onOpenCalcScreen: (day) => _openCalcScreen(store, day),
+            onPageChange: (index) {
+              store.dispatch(new SetCurrentPage(currentPage: index));
+            },
+            onFirstSession: () {
+              store.dispatch(SetFirstScreenVisibility(visibility: false));
+              _openInfoScreen(store);
+            },
+            onPurchaseNextMonth: () =>
+                store.dispatch(PurchaseNextMonth(onResult: showToast)),
+            onRestorePurchase: () =>
+                store.dispatch(RestorePurchase(onResult: showToast)),
+            onUpdateDay: (days) {
+              store.dispatch(SaveDays(days: days,
+                onComplete: () => store.dispatch(LoadMonths()),
+                onError: showToast,));
+            }
         );
       },
       builder: (BuildContext context, MainViewModel vm) {
@@ -132,7 +138,7 @@ class _MainScreenState extends BaseScreenState<MainScreen>
                           children: <Widget>[
                             Padding(
                               padding:
-                                  EdgeInsets.only(left: 36, top: 24, right: 36),
+                              EdgeInsets.only(left: 36, top: 24, right: 36),
                               child: Text(
                                 "Добро пожаловать!",
                                 style: TextStyle(
@@ -220,6 +226,7 @@ class _MainScreenState extends BaseScreenState<MainScreen>
         onDayClick: vm.onOpenCalcScreen,
         purchaseNextMonth: vm.onPurchaseNextMonth,
         restorePurchases: vm.onRestorePurchase,
+        onDayUpdate: vm.onUpdateDay,
       ));
     }
     return TabBarView(
