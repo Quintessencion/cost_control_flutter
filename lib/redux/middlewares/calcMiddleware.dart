@@ -65,6 +65,7 @@ class CalcMiddleware extends MiddlewareClass<AppState> {
       Future.delayed(
           const Duration(milliseconds: 1000), () => action.onComplete());
     }
+    next(action);
   }
 
   bool _isChanged(List<Expense> a, List<Expense> b) {
