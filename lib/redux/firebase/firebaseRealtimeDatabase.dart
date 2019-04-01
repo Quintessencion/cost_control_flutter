@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:cost_control/entities/day.dart';
 import 'package:cost_control/entities/month.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 
 class FirebaseRealtimeDatabase {
@@ -13,6 +14,9 @@ class FirebaseRealtimeDatabase {
     }
     return _instance;
   }
+
+  FirebaseUser _user;
+  String _userUid = "";
 
   //main table name
   static const String USERS = "users";
@@ -30,28 +34,26 @@ class FirebaseRealtimeDatabase {
   static const String SUM = "sum";
   static const String TIME_CREATION = "created";
 
-  final String uid = "ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ";
-
   DatabaseReference reference = FirebaseDatabase.instance.reference();
 
-  Future<Query> queryExpense() async {
-    String accountKey = await _getAccountKey();
-
-    return reference.child(USERS).child(accountKey).child(MONTHS);
-  }
+//  Future<Query> queryExpense() async {
+//    if (_userUid.isEmpty) return null;
+//
+//    return reference.child(USERS).child(_userUid).child(MONTHS);
+//  }
 
   void saveMonths(Map<String, dynamic> months) async {
-    String accountKey = await _getAccountKey();
+    if (_userUid.isEmpty) return;
 
-    reference.child(USERS).child(accountKey).child(MONTHS).update(months);
+    reference.child(USERS).child(_userUid).child(MONTHS).update(months);
   }
 
   Future<void> saveDay(Day day) async {
-    String accountKey = await _getAccountKey();
+    if (_userUid.isEmpty) return;
 
     reference
         .child(USERS)
-        .child(accountKey)
+        .child(_userUid)
         .child(MONTHS)
         .child("${day.parent.name}-${day.parent.yearNumber}")
         .child(DAYS)
@@ -59,32 +61,32 @@ class FirebaseRealtimeDatabase {
         .update(day.toMap());
   }
 
-  Future<Query> removeAll() async {
-    String accountKey = await _getAccountKey();
+  Future<void> removeAll() async {
+    if (_userUid.isEmpty) return;
 
-    reference.child(USERS).child(accountKey).remove();
-
-    return queryExpense();
+    reference.child(USERS).child(_userUid).remove();
+//    return queryExpense();
   }
 
   Future<StreamSubscription<Event>> getMonthStream(
       Month month, void onData(Month month)) async {
-    String accountKey = await _getAccountKey();
-
     StreamSubscription<Event> subscription = reference
         .child(USERS)
-        .child(accountKey)
+        .child(_userUid)
         .child(MONTHS)
         .child("${month.name}-${month.yearNumber}")
         .onValue
         .listen((Event event) {
       Map<dynamic, dynamic> value = event.snapshot.value;
       onData(Month.fromMap(value));
-      print("");
     });
 
     return subscription;
   }
 
-  Future<String> _getAccountKey() async => uid;
+  void setUser(FirebaseUser user, List<Month> months) {
+    _user = user;
+    _userUid = user.uid;
+    saveMonths(Month.listToMap(months));
+  }
 }

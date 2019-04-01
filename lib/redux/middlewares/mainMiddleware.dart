@@ -50,8 +50,6 @@ class MainMiddleware extends MiddlewareClass<AppState> {
 
     await computeMonths(months);
 
-    FirebaseRealtimeDatabase.instance.saveMonths(Month.listToMap(months));
-
     next(new OnMonthsLoaded(
       months: months,
     ));

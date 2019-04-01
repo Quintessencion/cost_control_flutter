@@ -1,17 +1,21 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:redux/redux.dart';
-import 'package:flutter_redux/flutter_redux.dart';
+
 import 'package:cost_control/baseScreenState.dart';
-import 'package:cost_control/utils/moneyUtils.dart';
-import 'package:cost_control/redux/states/appState.dart';
-import 'package:cost_control/redux/view_models/monthInfoViewModel.dart';
-import 'package:cost_control/redux/actions/monthInfoActions.dart';
-import 'package:cost_control/views/incomesFragment.dart';
-import 'package:cost_control/views/expensesFragment.dart';
 import 'package:cost_control/entities/month.dart';
 import 'package:cost_control/entities/monthMovement.dart';
+import 'package:cost_control/login/authService.dart';
+import 'package:cost_control/redux/actions/mainActions.dart';
+import 'package:cost_control/redux/actions/monthInfoActions.dart';
+import 'package:cost_control/redux/firebase/firebaseRealtimeDatabase.dart';
 import 'package:cost_control/redux/screens/editScreen.dart';
+import 'package:cost_control/redux/states/appState.dart';
+import 'package:cost_control/redux/view_models/monthInfoViewModel.dart';
+import 'package:cost_control/utils/moneyUtils.dart';
+import 'package:cost_control/views/expensesFragment.dart';
+import 'package:cost_control/views/incomesFragment.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_redux/flutter_redux.dart';
+import 'package:redux/redux.dart';
 
 class MonthInfoScreen extends StatefulWidget {
   final Month month;
@@ -50,6 +54,8 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
               percent: percent,
             ));
           },
+          onLogin: () => _onLogin(store),
+          onLogout: () => _onLogout(store),
         );
       },
       builder: (BuildContext context, MonthInfoViewModel vm) {
@@ -92,6 +98,7 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
           children: <Widget>[
             _getStatistics(vm),
             _getMovementView(vm),
+            _getSigningView(vm),
           ],
         ),
       ),
@@ -253,5 +260,56 @@ class _MonthInfoScreenState extends BaseScreenState<MonthInfoScreen>
     )).then((res) {
       store.dispatch(new ReloadMonth(month: store.state.monthInfoState.month));
     });
+  }
+
+  Widget _getSigningView(MonthInfoViewModel vm) {
+    return StreamBuilder(
+        stream: authService.user,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return _createSignButton(vm.onLogout, "Разлогиниться");
+          } else {
+            return _createSignButton(vm.onLogin, "Авторизоваться");
+          }
+        });
+  }
+
+  Widget _createSignButton(action, String buttonTitle) {
+    return InkWell(
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.symmetric(vertical: 16),
+        margin: EdgeInsets.only(left: 20, right: 20, bottom: 16),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.all(Radius.circular(16)),
+        ),
+        child: Text(
+          buttonTitle,
+          style: TextStyle(
+            fontFamily: "SFPro",
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: Color.fromRGBO(91, 122, 229, 1),
+          ),
+        ),
+      ),
+      onTap: action,
+    );
+  }
+
+  void _onLogin(Store<AppState> store) {
+    authService.googleSignIn().then((user) {
+      FirebaseRealtimeDatabase.instance
+          .setUser(user, store.state.mainState.months);
+      store.dispatch(
+          SetCurrentPage(currentPage: store.state.mainState.currentPage));
+    }).catchError((error) => showToast(error.message));
+  }
+
+  void _onLogout(Store<AppState> store) {
+    authService.signOut();
+    FirebaseRealtimeDatabase.instance.removeAll();
   }
 }
